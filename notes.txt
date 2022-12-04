@@ -1,0 +1,4 @@
+Securitatea algoritmilor criptografici în era calculatoarelor cuantice
+
+the impact of quantum computing on cryptography
+https://www.senetas.com/the-impact-of-quantum-computing-on-cryptography/
