@@ -1,0 +1,7 @@
+23.05 - 4 (CE + rezumat)
+24.05 - 5 (adunarea pct pe CE)
+25.05 - 0
+26.05 - 0
+27.05 - 6 (CE peste campuri finite)
+28.05 - 7 (adunarea pct peste CE peste campuri finite)
+29.05 - 4,5 (DLP + adaugarea bibliografie)

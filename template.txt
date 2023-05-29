@@ -1,0 +1,163 @@
+\documentclass[12pt]{article}
+\usepackage{times}\usepackage{setspace} \doublespacing
+
+\usepackage{url}
+\usepackage[margin=1.5in]{geometry}
+\usepackage{indentfirst}
+\usepackage{bm}
+\usepackage{accents}
+\usepackage{changepage}
+\usepackage{color}
+\usepackage{bigints}
+%\usepackage{arcs}
+\usepackage{yhmath}
+\usepackage{dirtytalk}
+\usepackage{tensor}
+\usepackage{comment}
+\usepackage[utf8]{inputenc}
+
+\usepackage{ulem}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{mathtools}
+\usepackage{latexsym,amsthm,amsfonts,amssymb,amsmath,amsxtra,mathrsfs,stmaryrd,bm}
+\usepackage{figsize,subfigure,graphicx,ifthen,calc,psfrag}
+\usepackage{upgreek}
+\usepackage[greek,english]{babel}
+\usepackage[round,compress]{natbib}
+\usepackage{hyperref}
+
+% creem propriile comenzi de tip teorema
+\newtheorem{prop}{Propozi\c{t}ia}[section]
+\newtheorem{teo}[prop]{Teorema}
+\newtheorem{defi}[prop]{Defini\c{t}ia}
+\newtheorem{exem}[prop]{Exemplul}
+\newtheorem{lem}[prop]{Lema}
+\newtheorem{rem}[prop]{Remarca}
+\newtheorem{coro}[prop]{Corolarul}
+
+% creem o comanda neexistenat
+\newcommand{\dd}[1]{\mathrm{d}\mathrm{#1}}
+
+%Schimbam denumirea unor comenzi existente
+\addto\captionsenglish{% Replace "english" with the language you use
+  \renewcommand{\contentsname}%
+  {Cuprins}%
+  \renewcommand{\abstractname}%
+  {Rezumat}%
+%    \renewcommand{\contentsname}{whatever}
+\renewcommand{\refname}{Bibliografie}
+\renewcommand{\proofname}{Demonstra\c{t}ie}
+}
+
+%Stabilim cat de departe (sectiune, subsectiune, paragraf, etc) mergem cu numerotarea
+\setcounter{tocdepth}{4} %pentru cuprins
+\setcounter{secnumdepth}{3} %pentru numerotarea sectiunilor
+
+
+\title{{\small A se consulta 
+\href{https://drive.google.com/file/d/1xj9kZZgTkcKMJkMLRuoYRgLQ1O8CX0mv/view}{\bf \color{blue} ghidul FMI}}\\
+{\bf Lucrare de finalizare de studii}
+}
+\author{Cuciureanu Dragoș-Adrian}
+\date{Iunie 2023}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\begin{abstract}
+     In aceasta lucrare raspundem la intrebarea "care e cea mai importanta intrebare din lume?".
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Introducere}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Preliminarii si concepte de baza}
+
+\begin{defi} \label{defi:va}
+Spunem ca $X:\Omega\rightarrow \mathbf{R}$ e o variabila aleatoare daca... 
+\end{defi}
+
+Conform Defini\c{t}iei \ref{defi:va}, avem ca... 
+
+\begin{rem}
+\begin{enumerate}[(i)]
+    \item Mentionam ca problema dezbatuta aici poate fi studiata si intr-un cadru mai general, ...
+    \item Daca se renunta la ipoteza 2, atunci rezultatul nu mai este valabil, pentru ca ...
+\end{enumerate}
+\end{rem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Rezultate principale}
+
+\begin{prop} \label{prop:convergenta}
+Avem ca
+\begin{equation} \label{eq:convergenta}
+    \lim\limits_n X_n=x.
+\end{equation}
+\end{prop}
+
+\begin{proof}
+Fie...
+\end{proof}
+
+Conform Propozi\c{t}iei \ref{prop:convergenta}, mai precis relatiei \eqref{eq:convergenta}, deducem ca...
+
+\subsection{Subsectiune}
+
+Rezultatul principal al acestei sectiuni este urmatorul; vezi, de exemplu, \cite{BeCi18}, Teorema 2.13.
+
+\begin{teo} \label{teo:clt}
+Daca $(X_n)_{n\geq 1}$ variabile aleatoare reale iid, de medie $0$ si variatie $1$, atunci
+\begin{equation}
+     \dfrac{X_1+\cdots X_n}{\sqrt{n}} \mathop{\Longrightarrow}\limits_n N(0,1).
+\end{equation}
+\end{teo}
+
+\begin{proof}
+Fie...
+\end{proof}
+
+\subsection{Subsectiune}
+
+\begin{teo} \label{teo:clt}
+Urmatoarele afirmatii sunt echivalente:
+\begin{enumerate}[(i)]
+    \item $\dfrac{X_1+\cdots X_n}{\sqrt{n}} \mathop{\Longrightarrow}\limits_n N(0,1)$
+    \item $\lim\limits_n\mathbb{P}\left(\left|\dfrac{X_1+\cdots X_n}{\sqrt{n}}\right|>x\right)=F(x)$, 
+    unde $F$ este ...
+\end{enumerate}
+\end{teo}
+
+\begin{proof}
+Fie...
+\end{proof}
+
+\subsection{Subsectiune}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Aplica\c{t}ii}
+
+\paragraph{Problema supermarketurilor.}
+In acest paragraf suntem interesati de urmatoarea situatie: bla bla
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\addcontentsline{toc}{section}{5\quad Bibliografie}
+\begin{thebibliography}{99}
+\bibitem{BeCi18} L. Beznea, I. C\^impean, Quasimartingales associated to Markov processes, Trans. Amer. Math. Soc., 370, 7761-7787 (2018).
+
+\end{thebibliography}
+
+\end{document}
