@@ -20,3 +20,7 @@ Licență v4
 04.06 - refactorizare cod (refacut meniu, stadiu final: adunare în R și Fp)
 05.06 - refactorizare cod (stadiu final: îmulțire în R și Fp, ECDH normal și improved)
 06.06 - refactorizare cod (stadiu final: ECEG normal și improved, ord pct, ord EC)
+07.06 - refactorizare cod (stadiu final: ord pct, ord EC, gen EC)
+      - scris securitate ECDLP + refactorizare sinteză + adăugat poze la exemple
+08.06 - refactorizare documentatie (stadiu final: cap 2 și 3)
+      - modificat poze exemple, facut tabele din poze
