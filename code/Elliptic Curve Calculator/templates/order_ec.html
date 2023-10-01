@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Determine the order of elliptic curve over \(F_p\)</h1>
+
+    <p>Please provide coefficients and the prime number for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\).</p>
+
+    We have used the library SimPy and imported EllipticCurve, more details can be found here
+    <a href="static/theory/license.pdf#page=88" target="_blank" title="Documentation">Chaper 5.11</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/order_ec" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>
+
+        <input type = "submit" value = "Determine Order" />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <script>
+        function reset() {
+        document.getElementById("myForm").reset();
+        }
+        </script>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif order %}
+        <!-- <img src = {{plot_url}} alt = "Chart cannot be displayed"> -->
+        
+        The elliptic curve 
+        <p><span class="math display">
+            \begin{equation}
+                E : Y^2 = X^3 + {{ec[0]}}X + {{ec[1]}} \text{ (mod } {{ec[2]}} \text{) } \\
+            \end{equation}
+        </span></p>
+        has the order of \({{order}}\).
+        <br>
+        That means that for every point \(P \in E(F_{ {{ec[2]}} })\)
+        <p><span class="math display">
+            \begin{equation}
+                order \cdot P = {{order}} \cdot P = O('inf', 'inf')
+            \end{equation}
+        </span>
+
+        You can check this in <a href="{{ url_for('multiplication_f') }}">Multiplication in \(F_p\)</a> page.
+            
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}

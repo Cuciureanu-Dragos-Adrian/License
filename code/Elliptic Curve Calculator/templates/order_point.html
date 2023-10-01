@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Determine the order of a point in \(E(F_p)\)</h1>
+
+    <p>Please provide coefficients and the prime number for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\).<br>
+    And coordinates for the point \(P\) that you want to determine the order for.</p>
+
+    To determine the order of point \(P\), we have adapted the algorithm Baby Step Giant Step, described in
+    <a href="static/theory/license.pdf#page=85" target="_blank" title="Documentation">Chaper 5.10</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/order_point" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>
+
+        <label> Point \(P_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_p_x"/> 
+        <br>
+        <label> Point \(P_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_p_y"/>
+        <br><br>
+
+        <input type = "submit" value = "Determine Order" />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <script>
+        function reset() {
+        document.getElementById("myForm").reset();
+        }
+        </script>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif orders %} 
+        The algorithm made a total of \({{orders[2]}}\) steps until the first collision.
+        <br>
+        After that we took every divisor of the number that was returned by the algorithm (initial \(order = {{orders[1]}}\)), 
+        because this could be a multiplier of the wanted order of the number.  
+        <br> 
+        After this process, the actual wanted order of point \(P = {{p}}\) is \({{orders[0]}}\), that means
+        <p><span class="math display">
+            \begin{equation}
+                order \cdot P = {{orders[0]}} \cdot {{p}} = O('inf', 'inf')
+            \end{equation}
+        </span>
+
+        You can check this in <a href="{{ url_for('multiplication_f') }}">Multiplication in \(F_p\)</a> page.
+            
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}

@@ -1,0 +1,1910 @@
+\documentclass[12pt]{article}
+\usepackage{times}\usepackage{setspace} \doublespacing
+
+\usepackage{url}
+\usepackage[margin=1.5in]{geometry}
+\usepackage{indentfirst}
+\usepackage{bm}
+\usepackage{accents}
+\usepackage{changepage}
+\usepackage{color}
+\usepackage{bigints}
+%\usepackage{arcs}
+\usepackage{yhmath}
+\usepackage{dirtytalk}
+\usepackage{tensor}
+\usepackage{comment}
+\usepackage[utf8]{inputenc}
+
+\usepackage{ulem}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{mathtools}
+\usepackage{latexsym,amsthm,amsfonts,amssymb,amsmath,amsxtra,mathrsfs,stmaryrd,bm}
+\usepackage{figsize,subfigure,graphicx,ifthen,calc,psfrag}
+\usepackage{upgreek}
+\usepackage[greek,english]{babel}
+\usepackage[round,compress]{natbib}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{float}
+
+% creem propriile comenzi de tip teorema
+\theoremstyle{plain}
+\newtheorem{prop}{Propozi\c{t}ia}[section]
+\newtheorem{lem}[prop]{Lema}
+\newtheorem{coro}[prop]{Corolarul}
+
+\theoremstyle{definition}
+\newtheorem{defi}[prop]{Defini\c{t}ia}
+\newtheorem{teo}[prop]{Teorema}
+\newtheorem{exem}[prop]{Exemplul}
+
+\theoremstyle{remark}
+\newtheorem{rem}[prop]{Remarca}
+
+
+% creem o comanda neexistenat
+\newcommand{\dd}[1]{\mathrm{d}\mathrm{#1}}
+
+%Schimbam denumirea unor comenzi existente
+\addto\captionsenglish{% Replace "english" with the language you use
+  \renewcommand{\contentsname}%
+  {Cuprins}%
+  \renewcommand{\abstractname}%
+  {Rezumat}%
+%    \renewcommand{\contentsname}{whatever}
+\renewcommand{\refname}{Bibliografie}
+\renewcommand{\proofname}{Demonstra\c{t}ie}
+}
+
+%Stabilim cat de departe (sectiune, subsectiune, paragraf, etc) mergem cu numerotarea
+\setcounter{tocdepth}{4} %pentru cuprins
+\setcounter{secnumdepth}{3} %pentru numerotarea sectiunilor
+\setcitestyle{square}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\pagenumbering{gobble} 
+\begin{titlepage}
+
+\newgeometry{left=2cm,right=2cm,bottom=1cm}
+
+\begin{figure}[!htb]
+    \centering
+    \begin{minipage}{0.2\textwidth}
+        \includegraphics[width=\linewidth]{logo/logo-ub.png}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \large
+        \vspace{0.2cm}
+        \begin{center}
+            \textbf{UNIVERSITATEA DIN BUCUREȘTI}
+        \end{center}
+        \vspace{0.3cm}
+        \begin{center}
+            \textbf{
+                FACULTATEA DE \
+                MATEMATICĂ ȘI INFORMATICĂ
+            }
+        \end{center}
+    \end{minipage}
+    \begin{minipage}{0.2\textwidth}
+        \includegraphics[width=\linewidth]{logo/logo-fmi.png}
+    \end{minipage}
+\end{figure}
+
+\begin{center}
+\textbf{SPECIALIZAREA INFORMATICĂ}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+\Large \textbf{Lucrare de licență}
+\end{center}
+
+\begin{center}
+\huge \textbf{\MakeUppercase{Rolul Algoritmilor geometrici în criptografie}}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\large \textbf{Absolvent \ Cuciureanu Dragoș-Adrian}
+\end{center}
+
+\vspace{0.25cm}
+
+\begin{center}
+\large \textbf{Coordonator științific \ Conf. Dr. Stupariu Mihai Sorin}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\Large \textbf{București, iunie 2023}
+\end{center}
+\end{titlepage}
+
+\restoregeometry
+\newgeometry{
+    margin=2.5cm
+}
+
+\newpage
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\begin{abstract}
+În această Lucrare de Licență vom aborda tematica "Rolul algoritmilor geometrici în criptografie", focusul fiind pus pe curbe eliptice. 
+     
+Subiectul curbelor eliptice înglobează o mare cantitate de teorie matematică. Scopul acestei lucrări este de a oferi un rezumat concis al conceptelor fundamentale necesare aplicațiilor criptografice.
+     
+Acestă lucrare va fi împărțită în două părți: prima va consta într-o sinteză a teoriei, iar cea din urmă va fi o documentație a aplicației suport pe care am realizt-o, ce poate efectua diferite operații pe curbe eliptice, precum adunarea si înmultirea pe $\mathbb{R}$ și pe $\mathbb{F}_p$, dar și crearea a curbe elptice aleatoare peste un anumit corp finit și prezentarea a diferite informații despre aceasta.
+     
+Capturile de ecran din lucrare sunt predominant realizate în aplicația suport creată la exemplele redactate, iar pentru figurile ce prezintă algoritmi au fost preluate din \cite{ref1}.
+\end{abstract}
+\vspace{1cm}
+\renewcommand{\abstractname}%
+  {Abstract}
+\begin{abstract}
+
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{4}
+\section{Introducere}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Preliminarii și concepte de bază în curbe eliptice}
+    
+\subsection{Curbe eliptice}
+
+Următoarul paragraf a fost preluat și adaptat din \cite{ref2}.
+
+\begin{defi}
+Fie $\mathbb{K}$ un corp comutativ ($\mathbb{K}$ poate fi corpul numerelor reale $\mathbb{R}$, corpul $\mathbb{F}_p$, unde $p$ este număr prim, sau corpul $\mathbb{F}_{p^k}$, unde $p$ este un număr prim și ${k} \geq 1$.). Fie $a,b \in \mathbb{K}$ două elemente aparținând de corpul $\mathbb{K}$ și $f(X) = X^3 + aX + b$ un polinom cu coeficienți în $\mathbb{K}$. Acest polinom definește o curbă peste corpul $\mathbb{K}$:
+
+    $$E(\mathbb{K}) = \bigl\{(X,Y) \in \mathbb{K}^2 : Y^2 = f(X)\bigl\}$$ 
+\end{defi}
+
+Fie $x_1, x_2, x_3$ rădăcinile polinomului $f(X) = X^3 + aX + b$, atunci discriminantul său este:
+\begin{equation*}
+\begin{split}
+    \Delta_E & = \bigr[(x_1 - x_2)(x_2 - x_3)(x_3 - x_1)\bigr]^2 \\
+             & = -16(4a^3 + 27b^2)
+\end{split}
+\end{equation*}
+
+Cum în viitor vom lua $\Delta_E$ în contextul $\Delta_E \neq 0$, putem considera:
+\begin{equation*}
+\begin{split}
+    \Delta_E & = -4a^3 - 27b^2 \text{ sau} \\
+             & = 4a^3 + 27b^2
+\end{split}
+\end{equation*}
+
+% \begin{proof}
+% Fie relațiile lui Vi\`ete pentru rădăcini:
+% \begin{equation*}
+% \begin{split}
+%     x_1 + x_2 + x_3 & = 0 \\
+%     x_1x_2 + x_2x_3 + x_3x_1 & = a \\
+%     x_1x_2x_3 & = -b
+% \end{split}
+% \end{equation*}
+
+% Derivăm $f(X)$ si obținem:
+% \begin{equation*}
+%     f'(X) = 3X^2 + a 
+% \end{equation*}
+
+% Introducem rădăcinile $x_1, x_2, x_3$ în ecuație și cu ajutorul relațiilor lui Vi\`ete rezultă:
+% \begin{equation*}
+% \begin{split}
+%     f'(x_1) & = (x_1 - x_2)(x_1 - x_3) \\
+%     f'(x_2) & = (x_2 - x_1)(x_2 - x_3) \\
+%     f'(x_3) & = (x_3 - x_1)(x_3 - x_2) 
+% \end{split}
+% \end{equation*}
+
+% Realizând produsul ecuațiilor anterioare și înlocuind în relațiile lui Vi\`ete obținem discriminantul curbei.
+% \end{proof}
+
+Pentru a avea o curbă eliptică, toate rădăcinile trebuie sa fie distince una față de celelalte.
+
+% TO DO: de adăugat documentația la bibliografie
+\begin{rem}
+Polinomul $f$ are rădăcini distince una față de celelalte, dacă și numai dacă $\Delta_E \neq 0$.
+\end{rem}
+
+% TO DO: de adăugat documentația la bibliografie
+\begin{defi}
+Fie $F(X, Y) = Y^2 - X^3 - aX - b$ și punctul $P(x_0, y_0) \in E(\mathbb{K})$ un punct de pe curbă. Punctul se numește singular dacă:
+\begin{equation*}
+    \dfrac{\partial F}{\partial x}(x_0, y_0) = \dfrac{\partial F}{\partial y}(x_0, y_0) = 0
+\end{equation*}
+\end{defi}
+
+% TO DO: de adăugat documentația la bibliografie
+\begin{defi}
+O curbă $E(\mathbb{K})$ cu $\Delta_E \neq 0$ nu are puncte singulare.
+\end{defi}
+
+\begin{proof}
+Presupunem prin absurd că o curbă $E(\mathbb{K})$ cu $\Delta_E \neq 0$ are punct singular $P(x_0, y_0)$. Acesta ar fi soluția derivaleor parțiale ale funcției $F(X, Y) = X^3 + aX + b - Y^2$. Calculăm derivatele sale parțiale:
+\begin{equation*}
+\begin{split}
+    \dfrac{\partial F}{\partial x}(x_0, y_0) & = 3x_0^2 + a = 0 \\
+    \dfrac{\partial F}{\partial y}(x_0, y_0) & = -2y_0 = 0 
+\end{split}
+\end{equation*}
+
+Din a doua ecuație obținem că $y_0 = 0$ și introducem în $Y^2 = X^3 + aX + b$ rezulă că $x_0^3 + ax_0 + b = 0$. Iar din prima ecuație obținem $a = -3x_0^2$ și înlocuind în ecuația obținută anterior avem:
+\begin{equation*}
+\begin{split}
+    x_0^3 + ax_0 + b & = 0 \\
+    x_0^3 - 3x_0^2x_0 + b & = 0 \\
+    -2x_0^3 + b & = 0 \\
+    b & = 2x_0^3
+\end{split}
+\end{equation*}
+
+Aducând in formula discriminantului avem:
+\begin{equation*}
+\begin{split}
+    \Delta_E & = -4a^3 - 27b^2 \\
+    \Delta_E & = -4(-3x_0^2)^3 - 27(2x_0^3)^2 \\
+    \Delta_E & = 108x_0^6 - 108x_0^3 \\
+    \Delta_E & = 0 \\
+    \text{dar } \Delta_E & \neq 0 \Rightarrow \bot
+\end{split}
+\end{equation*}
+\end{proof}
+
+\begin{exem}
+Exemple de curbe care au $\Delta_E = 0$ (au puncte singulare):
+\begin{equation*}
+\begin{split}
+     E1 : Y^2 & = X^3 \text{ vârful de  coordonate  $(0, 0)$  este  punct  de  inflexiune} \\
+     E2 : Y^2 & = (X + 1)^2(X-2) = X^3 -3x - 2 \text{ punctul de coordonate $(-1, 0)$} \\ 
+     \text{ este izolat}
+\end{split}
+\end{equation*}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{Licenta/capturi/teorie/punct izolat curbă.png}
+    \caption{Punctul izolat al curbei eliptice $E : X^3 -3x - 2$ }
+    \label{fig:punct_izolat}
+\end{figure}
+
+\end{exem}
+
+\begin{defi}
+Fie $\mathbb{K}$ un corp comutativ ($\mathbb{K}$ poate fi corpul numerelor reale $\mathbb{R}$, corpul $\mathbb{F}_p$, unde $p$ este număr prim, sau corpul $\mathbb{F}_{p^k}$, unde $p$ este un număr prim și ${k} \geq 1$.). Fie $a,b \in \mathbb{K}$ două elemente aparținând de corpul $\mathbb{K}$ și $f(X) = X^3 + aX + b$ un polinom cu coeficienți în $\mathbb{K}$. Acest polinom definește o curbă eliptică peste corpul $\mathbb{K}$:
+
+\begin{equation*}
+\begin{split}
+     E(\mathbb{K}) & = \bigl\{(X,Y) \in \mathbb{K}^2 : Y^2 = f(X)\bigl\} \: \cup \: \bigl\{O(\infty, \infty)\bigl\} \\
+     \text{cu } \Delta_E & \neq 0
+\end{split}
+\end{equation*}
+\end{defi}
+
+Pe scurt, putem spune că o curbă elitpică este totalitatea soluțiilor ecuației cu $\Delta_E \neq 0$ de forma:
+
+\begin{equation*}
+     E : Y^2 = X^3 + aX + b
+\end{equation*}
+
+Ecuațiile de acestă natură se cheamă ecuații \textit{Weierstrass}.
+
+\begin{exem}
+Exemple de curbe eliptice:
+\begin{equation*}
+\begin{split}
+     E_1 : Y^2 & = X^3 + X + 8 \\
+     E_2 : Y^2 & = X^3 - 4X - 1
+\end{split}
+\end{equation*}
+\end{exem}
+
+Așa arată exemplele ilustrate:
+% TO DO: de adăugat ss din aplicație cu reprezentările
+\begin{figure}[H]
+\centering
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{Licenta/capturi/teorie/ex X^3 + X + 8.png}
+      \caption{$E_1 : Y^2 = X^3 + X + 8$}
+      \label{fig:ex_ec1}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{Licenta/capturi/teorie/ex X^3 - 4X - 1png.png}
+      \caption{$E_2 : Y^2 = X^3 - 4X - 1$}
+      \label{fig:ex_ec2}
+    \end{minipage}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Adunarea punctelor pe curbe eliptice}
+
+Adunarea pe o curbă eliptică este operația de a "combina" două puncte de pe curbă pentru a produce un al treilea punct. Operația de adăugare este definită geometric și joacă un rol fundamental în criptografia cu curbe eliptice.
+
+Fie două puncte de pe curba eliptică $E$: $P(x_1, y_1) \: și \: Q(x_2, y_2)$. Trasăm dreapta ce trece prin cele 2 puncte. Cum curba eliptică este determinată de un polinom de gradul 3, dreapta desenată va interesecta curba eliptică $E$ în exact 3 puncte (nu este nevoie ca acestea să fie dintincte). Vom nota al treilea punct din intersecție cu $R'(x_3, y_3)$, realizăm reflecția sa față de axa $OX$ (curba eliptică $E$ este simetrică față de axa $OX$) adică, din punct de vedere numeric înmulțim coordonata a doua a punctului $R$ cu $-1$, acest punct va fi notat cu $R$ și va avea coordonatele $(x_3, -y_3)$.
+
+Punctul $R$ este rezultatul "adunării" între punctele $P$ si $Q$. Pentru a nu confunda acestă operație cu adunarea naturala o vom nota cu:
+\begin{equation*}
+    P \oplus Q = R
+\end{equation*}
+
+\begin{exem} \label{exem:adunareec1}
+Fie curba eliptică E de ecuație:
+\begin{equation}\label{equation:ec1}
+     E : Y^2 = X^3 - 7X + 10
+\end{equation}
+
+Și punctele $P(1, 2)$ și $Q(3, 4)$ de pe $E$. Calculăm ecuația dreptei $L$ ce intersectează punctele cu ajutorul pantei:
+\begin{equation} \label{equation:slope_ec1}
+\begin{split}
+     m & = \dfrac {y_2 - y_1} {x_2 - x_1} \\
+     & = \dfrac {4 - 2} {3 - 1} = 1 \\
+     L & : Y - y_1 = m (X - x_1) \\
+     L & : Y - 2 = 1 (X - 1) \\
+     L & : Y = X + 1
+\end{split}
+\end{equation}
+
+Pentru a determina $R'$ calculăm toate punctele de intersecție dintre dreapta $L$ si curba eliptică $E$, substituind ecuația lui $L$ \eqref{equation:slope_ec1} în ecuția lui $E$ \eqref{equation:ec1}:
+\begin{equation} \label{equation:resulted_ec1}
+\begin{split}
+     (X + 1)^2 & = X^3 - 7X + 10 \\
+     X^2 + 2X + 1 & = X^3 - 7X + 10 \\
+     X^3 - X^2 - 9X + 9 & = 0 
+\end{split}
+\end{equation}
+
+Cum ecuția rezultată la \eqref{equation:resulted_ec1} este de gradul 3, o să aibă exact 3 rădăcini. Cum punctele $P(1, 2)$ și $Q(3, 4)$ sunt si pe dreaptă si pe curbă, înseamnă că $1$ și $3$ sunt rădăcini, deci ne rămâne de găsit doar a 3-a rădăcină (descompunem în factori):
+\begin{equation*}
+\begin{split}
+     X^3 - X^2 - 9X + 9 & = (X - 3)(X - 1)(X + 3) \\
+     (X - 3)(X - 1)(X + 3) & = 0
+\end{split}
+\end{equation*}
+
+Din descompunerea în factori determinăm că a treia rădăcină este $-3$, aceasta fiind și componenta $R_x$, acum calculăm componeneta $R_y$ din ecuția dreptei de la punctul \eqref{equation:slope_ec1}:
+\begin{equation*}
+\begin{split}
+     Y & = X + 1 \\
+       & = (-3) + 1 = -2
+\end{split}
+\end{equation*}
+
+Astfel obținem punctul $R(-3, -2)$, tot ce rămăne de făcut pentru a obține rezultatul căutat este să reflectăm componenta $R_y$ și obținem $R'(-3, 2)$, prin urmare:
+\begin{equation*}
+    P \oplus Q = (-3, 2)
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+Acesta este cazul general de adunare a două puncte de pe o curbă eliptică. Însă există și căteva cazuri particulare, fie punctul $P(x, y)$, $P' = -P = (x, -y)$ și punctul $O(\infty, \infty)$:
+\begin{enumerate}[(i)]
+    \item $P \oplus P$ adunarea unui punct cu el însuși
+    \item $P \oplus P'$ adunarea unui punct cu inversul său 
+    \item $P \oplus O$ adunarea unui punct cu infinit
+\end{enumerate}
+
+Începem cu primul caz particular, pentru a realiza $P \oplus P$ dreapta $L$ va fi tangenta la $E$, astfel dreapta intersectează curba eliptică tot în 3 puncte, doar ca 2 dintre acestea sunt $P$ (putem să facem o paralelă cum un polinom ca $(x-1)^2$ are 2 rădăcini, chiar dacă acestea sunt identice). Al 3-lea punct va fi $R$ și apoi calculăm $R'$ la fel ca mai sus.
+
+\begin{exem}
+Considerăm aceeași curbă eliptică $E$ și $P(1, 2)$ de la \eqref{equation:ec1} și calculăm $P \oplus P$:
+
+Determinăm panta lui $E$ prin diferențiere în (1):
+\begin{equation*}
+\begin{split}
+     2Y \dfrac {dY} {dX} & = 3X^2 - 7 \\
+     \dfrac {dY} {dX} & = \dfrac {3X^2 - 7} {2Y} 
+\end{split}
+\end{equation*}
+
+Calculăm panta lui $E$ în $P$ substituind $P$ în ecuție și obținem panta $m = \dfrac {-4} {4} = -1$. Astfel tangenta la $E$ în $P$ este:
+\begin{equation} \label{equation:ecuatia_dreptei}
+\begin{split}
+     L & : Y - y_1 = m (X - x_1) \\
+     L & : Y - 2 = -1 (X - 1) \\
+     L & : Y = -X + 3
+\end{split}
+\end{equation}
+
+Analog ca la adunarea generală, determiăm $R'$ calculând toate punctele de intersecție dintre dreapta $L$ si curba eliptică $E$, substituind ecuația lui $L$ \eqref{equation:ecuatia_dreptei} în ecuția lui $E$ \eqref{equation:ec1}:
+\begin{equation}
+\begin{split}
+     (-X + 3)^2 & = X^3 - 7X + 10 \\
+     X^2 - 6X + 9 & = X^3 - 7X + 10 \\
+     X^3 - X^2 - X + 1 & = 0 \\
+     (X - 1)^2(X + 1) & = 0
+\end{split}
+\end{equation}
+
+Observăm din descompunere ca rădăcinile sunt: $-1$, $1$ și $1$ (de remarcat că rădăcina $1$, mai exact componenta $P_x$ apare de două ori). Cea de-a treia rădăcină este componenta $R_x$, pe care o introducem în ecuația de la (4) și obținem $R(-1, 4)$, respectiv $R'(-1, -4)$:
+\begin{equation*}
+    P \oplus P = (-1, -4)
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+Trecem la al doilea caz: $P \oplus P'$ (adunarea unui punct cu opusul său).
+
+\begin{defi}
+Definim ca fiind punctul de la "infinit" punctul $O(\infty, \infty)$.
+\end{defi}
+
+Acest punct nu există în planul $XOY$. Făcând o referință la definiția care precizează că două drepte paralele se întâlnesc la "infinit", atunci considerăm că toate verticalele paralele cu $OY$ se intersectează în punctul $O(\infty, \infty)$.
+
+Revenind la al doilea caz, observăm că apar probleme când încercăm să adunăm la punctul $P(x, y)$, reflexia (opusul) sa față de axa $OX$, mai exact punctul $P' = -P = (x, -y)$. Încercăm să reprezentăm geometric adunarea ducând dreapta $L$ prin punctele $P$ și $P'$, astfel creând o verticală paralelă cu $OY$ cu $X = x$. Neexistând un al treilea punct al intersecției, considerăm punctul $O(\infty, \infty)$ definit anterior ca fiind rezultatul adunării.
+\begin{equation*}
+    P \oplus P' = O
+\end{equation*}
+
+\begin{exem}
+Considerăm aceeași curbă eliptică $E$ de la \eqref{equation:ec1} și punctele $P(1, 2)$ și $P'(1, -2)$ existente pe $E$ și calculăm $P \oplus P'$ ca fiind:
+\begin{equation*}
+    P(1, 2) \oplus P'(1, -2) = O(\infty, \infty)
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+Cazul al treilea: $P \oplus O$ (adunarea unui punct cu infinit).
+
+Odată ce am definit punctul de la "infinit" $O$, trebuie să definim cum se adună un punct oarecare $P(x, y)$ de pe o curbă elitptică $E$ împreună cu punctul $O$. Și această speță este mai ușor de prezentat cu ajutorul reprezentării geoemtrice. Cum punctul $O$ există pe fiecare verticală, putem construi dreapta $L$ ca fiind dreapta ce trece prin punctele $P$ și $O$. Dreapta $L$ intersectează curba eliptică $E$ în trei puncte: $P$, $O$ și $P'$. Deci, conform algorimului de adunare definit anterior, rezultă că $R = P'$ și $R' = P$, astfel:
+\begin{equation*}
+    P \oplus O = P
+\end{equation*}
+
+Deci, punctul $O$ este element neutru la adunarea pe curbe elitpice.
+
+\begin{exem}
+Considerăm aceeași curbă eliptică E de la \eqref{equation:ec1} și punctul $P(1, 2)$ existent pe E și calculăm $P \oplus O$ ca fiind:
+\begin{equation*}
+    P(1, 2) \oplus O(\infty, \infty) = P(1, 2)
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+Pe lângă acestea mai există încă un speță particulară, care este reuniunea cazurilor 1 și 2 anterioare. Mai exact când adunăm punctul $P(x, y)$ cu el însuși și rezultă $O(\infty, \infty)$:
+\begin{equation*}
+    P \oplus P = O
+\end{equation*}
+
+Dar tocmai am arătat că: 
+\begin{equation*}
+    P \oplus P' = O
+\end{equation*}
+
+Deci $P(x, y) = P'(x, -y)$, ceea ce însemnă că $y = -y$, singura soluție validă fiind $y = 0$. Pe scurt acest caz se poate realiza doar când adunăm un punct cu el însuți și tangenta este o verticală paralelă cu $OX$.
+
+\begin{exem}
+Fie curba eliptică $E$ în $\mathbb{R}$:
+\begin{equation*}
+    E : Y^2 = X^3 -6X + 9
+\end{equation*}
+
+Și punctele $P(-3, 0)$ și $P'(-3, 0)$:
+\begin{equation*}
+\begin{split}
+     P(-3, 0) & = P'(-3, 0) \\
+     P(-3, 0) + P(-3, 0) & =  P(-3, 0) + P'(-3, 0)\\
+     P(-3, 0) + P(-3, 0) & = 0(\infty, \infty)
+\end{split}
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+\begin{defi}
+Fie o curbă eliptică $E$ în $\mathbb{R}$ și punctele $P(x_1, y_1)$ și $Q(x_2, y_2)$, notăm reflexia punctului față de axa OX ca fiind $P' = -P = (x_1, -y_1)$, definim scăderea ca fiind:
+\begin{equation*}
+     P - Q = P \oplus (-Q) = P \oplus Q'
+\end{equation*}
+
+Sau direct:
+\begin{equation*}      
+     P - Q = P + (-Q) = P + Q'
+\end{equation*}
+\end{defi}
+
+\begin{exem}
+Considerăm adunarea pe curba eliptică $E$ în $\mathbb{R}$ și punctele $P(1, 2)$, $Q(3, 4)$, $Q'(3, -4)$ și $R(-3, 2)$ existente pe $E$ de la Exemplul \ref{exem:adunareec1}:
+\begin{equation*}
+    P \oplus Q = R
+\end{equation*}
+
+Deci:
+\begin{equation*}
+\begin{split}
+     P - Q' & = P \oplus (-Q') \\
+     & = P \oplus Q \\
+     & = R
+\end{split}
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+
+\begin{defi}
+Fie o curbă eliptică $E$ în $\mathbb{R}$ și punctul $P(x, y)$ de pe $E$ și scalarul $n$, definim înmulțirea ca fiind adunarea repetată a punctului $P$ cu el însuși de $n$ ori:
+\begin{equation*}
+     n \otimes P = \underbrace{P \oplus P \oplus P \oplus ... \oplus P}_\text{n times}
+\end{equation*}
+
+Sau direct:
+\begin{equation*}      
+     nP = \underbrace{P + P + P + ... + P}_\text{n times}
+\end{equation*}
+\end{defi}
+
+\begin{exem}
+Considerăm aceeași curbă eliptică $E$ în $\mathbb{R}$ de la \eqref{equation:ec1}, punctul $P(1, 2)$ existent pe $E$ și scalarul $n$:
+\begin{equation*}
+\begin{split}
+     4P & = P + P + P + P \\
+     & = (1, 2) + (1, 2) + (1, 2) + (1, 2) \\
+     & = (-1, -4) + (1, 2) + (1, 2) \\
+     & = (9, -26) + (1, 2) \\
+     & = (2.25, 2.375)
+\end{split}
+\end{equation*}
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+\begin{teo} \label{teo:adunaregrupabelian}
+Fie o curbă eliptică $E$ în $\mathbb{R}$, și fie $\mathbb{E}$ mulțimea punctelor de pe $E$, atunci ($\mathbb{E}$, $\oplus$) formează un grup abelian:
+\begin{enumerate}
+    \item Asociativitate: $P + Q = P + Q + P$ pentru orice $P,Q \in \mathbb{E}$
+    \item Comutativitate: $(P + Q) + R = P + (Q + R)$ pentru orice $P,Q,R \in \mathbb{E}$
+    \item Element neutru: $P + O = O + P = P$ pentru orice $P \in \mathbb{E}$
+    \item Inversibilitate: $P + (-P) = O$ pentru orice $P \in \mathbb{E}$
+\end{enumerate}
+\end{teo}
+% TO DO: de adaugat demonstratie?
+
+Următorul paragraf este preluat din \cite{ref1}.
+\begin{teo} \label{teo:formulaadunare}
+Fie o curbă eliptică E: 
+\begin{equation*}
+     E : Y^2 = X^3 + aX + b
+\end{equation*}
+și punctele $P(x_1, y_1)$ și $Q(x_2, y_2)$ de pe E, algoritmul de adunare în pseudocod este:
+\begin{enumerate}[(a)]
+    \item dacă $P = O$, atunci $P + Q = Q$
+    \item altfel, dacă $P = O$, atunci $P + Q = Q$
+    \item altfel, dacă $x_1 = x_2$ și $y_1 = -y_2$, atunci $P + Q = O$
+    \item altfel, calculăm panta m ca fiind:
+    \begin{equation*}
+        m =
+        \left\{
+        	\begin{array}{ll}
+        		\dfrac{y_2 - y_1}{x_2 - x_1}  & \mbox{dacă } P \neq Q \\
+                \\
+        		\dfrac{3x_1^2 + a}{2y_1}  & \mbox{dacă } P = Q \\
+        	\end{array}
+        \right.
+    \end{equation*}
+    
+    și fie:
+    \begin{equation*}
+    \begin{split}
+         x_3 & = m^2 - x_1 - x_2 \\
+         y_3 & = m(x_1 - x_3) - y_1 \\
+    \end{split}
+    \end{equation*}
+
+    rezultă:
+    \begin{equation*}
+        P + Q = (x_3, y_3)
+    \end{equation*}
+\end{enumerate}
+\end{teo}
+
+Următorul demonstrație este preluată și adaptată din \cite{ref1}.
+\begin{proof}
+Subpunctele (a) și (b) sunt prezentate anterior. Cazul (d) este atunci când linia ce trece prin $P$ și $Q$ este verticală, deci $P + Q = O$ (dacă $y_1 = y_2 = 0$, atunci tangenta este verticală și acest caz este  acoperit de asemenea). Pentru subpunctul (e), dacă $P \neq Q$, atunci $m$ este panta dreptei ce trece prin $P$ și $Q$, altfel $m$ este panta tangentei la $P = Q$. În ambele cazuri, dreapta $L$ este dată de ecuația:
+\begin{equation*}
+\begin{split}
+    Y & = mX + \nu \\
+    \nu & = y_1 - mx_1
+\end{split}
+\end{equation*}
+
+Substituind ecuația dreptei $L$ în ecuția curbei $E$ rezultă:
+\begin{equation*}
+    (mX + \nu)^2 = X^3 + aX + b
+\end{equation*}
+
+Deci:
+\begin{equation*}
+    X^3 - m^2X^2 + (a - 2m\nu)X + (b - \nu^2) = 0
+\end{equation*}
+
+Știm ca două dintre rădăcini sunt $x_1$ și $x_2$ și cum ecuația este de gradul 3 înseamnă că are 3 rădăcini. Notăm a treia rădăcină $x_3$ și factorizăm:
+\begin{equation*}
+    X^3 - m^2X^2 + (a - 2m\nu)X + (b - \nu^2) = (x - x_1) (x - x_2) (x - x_3)
+\end{equation*}
+
+Înmulțim partea dreaptă și ne uităm la coeficienții lui $X^2$ de pe ambele părți. Coeficientul din dreapta de $-x_1 - x_2 - x_3$ trebuie să fie egal cu cel din stânga $-m^2$. Astfel rezultă $x_3 = m^2 - x_1 - x_2$. Apoi obținem coordonata $Y$ al celui de al treilea punct de intersecție dintre $E$ și $L$ ca fiind $mx_3 + \nu$. Pentru a obține $P + Q$ trebuie sa luăm opusul componentei $Y$ față de axa $OX$ și obținem $y_3 = m(x_1 - x_3) - y_1$.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Curbe eliptice peste corpuri finite}
+
+În subcapitolele anterioare am prezentat curbele eliptice și operațiile ce se pot realiza pe acestea. Abordartea a fost predominant dintr-un punct de vedere geometric, spre exemplu, la adunarea a două puncte $P$ și $Q$ de pe o curbă epitică $E$, am tras o linie ce trece prin cele două puncte și am determinat care este ce de al treilea punct în care intersectează dreapta curba eliptică și am realizat reflexia față de axa $OX$. Aceasta poate fi observată în subcapitolul anterior unde am arătat cum se realizează operații pe curbe elitpice.
+
+În criptografie se folosesc curbe eliptice peste corpuri finite, ci nu curbe eliptice, deoarece acestea oferă garanții de securitate mai bune și eficiență din punct de vedere computațional. Aceste proprietăți fac din criptografia cu curbe eliptice pe corpuri finite o alegere populară în sistemele criptografice moderne. Deci, trebuie să examinăm curbele eliptice ale căror puncte au coordonate într-un corp finit $\mathbb{F}_p$ pentru a aplica teoria curbelor eliptice la criptografie.
+
+\begin{defi}
+Fie $\mathbb{F}_p$ un corp comutativ, unde $p$ este număr prim, cu $p \geq 3$. Fie $a,b \in \mathbb{F}_p$ două elemente aparținând de corpul $\mathbb{F}_p$ și $f(X) = X^3 + aX + b$ un polinom cu coeficienți în $\mathbb{F}_p$. Acest polinom definește o curbă eliptică peste corpul $\mathbb{F}_p$:
+\begin{equation*}
+\begin{split}
+     E(\mathbb{F}_p) & = \bigl\{(X,Y) \in \mathbb{F}_p^2 : Y^2 = f(X)\bigl\} \: \cup \: \bigl\{O\bigl\} \\
+     \text{cu } \Delta_E & = 4a^3 + 27b^2 \neq 0
+\end{split}
+\end{equation*}
+\end{defi}
+
+\begin{rem}
+Momentan numărul prim $p$ va fi $p \geq 3$. Curbelor eliptice peste $\mathbb{F}_2$ și peste $\mathbb{F}_{2^k}$ sunt importante, dar sunt de o complexitate mai ridicată.
+\end{rem}
+
+Datele din exemplu au fost preluate din \cite{ref2}.
+\begin{exem}
+Fie curbă eliptică $E$ peste $\mathbb{F}_5$:
+\begin{equation} \label{equation:ec2}
+    E : Y^2 = X^3 + 1  \text{ mod $5$}
+\end{equation}
+
+O metodă de a determina punctele curbei eliptice $E(\mathbb{F}_5)$ este de a da toate valorile lui $X$: $0, 1, 2, 3, 4$:
+\begin{equation*}
+\begin{split}
+     f(0) & = 0 + 1 = 1 \\
+     f(1) & = 1 + 1 = 2 \\
+     f(2) & = 8 + 1 = 3 + 1 = 4 \\
+     f(3) & = 27 + 1 = 2 + 1 = 3 \\
+     f(4) & = 64 + 1 = 4 + 1 = 5 = 0 \\
+\end{split}
+\end{equation*}
+
+Și să verificăm în ecuația curbei care rezultate sunt resturi pătratice:
+\begin{equation*}
+\begin{split}
+     0^2 & \equiv 0 \text{ mod } 5 \\
+     1^2 & \equiv 4^2 \equiv 1 \text{ mod } 5 \\
+     2^2 & \equiv 3^2 = 4 \text{ mod } 5 
+\end{split}
+\end{equation*}
+
+Observăm că doar $0$, $1$ și $4$ sunt resturi pătratice, deci spre exemplu pentru $X = 0$, $Y^2 = f(X) = 1$, ceea ce înseamnă că $y$ poate fi $\pm 1 \text{ mod $5$}$, adică $1$ sau $4$, deci rezultă punctele $(0, 1)$ și $(0, 4)$ în $E(\mathbb{F}_5)$.
+
+Analog determinăm restul punctelor:
+\begin{equation*}
+    E(\mathbb{F}_5) = \bigl\{(0, 1), (0, 4), (2, 2), (2, 3), (4, 0), O\bigl\}
+\end{equation*}
+
+Astfel, cardinalul mulțimii $E(\mathbb{F}_5)$ este $6$.
+
+% TO DO: de adăugat ss din aplicație cu reprezentărea
+\end{exem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Adunarea punctelor pe curbe eliptice peste corpuri finite}
+
+Fie o curbă eliptică $E$ peste $\mathbb{F}_p$: 
+\begin{equation*}
+     E : Y^2 = X^3 + aX + b \: (mod \: p)
+\end{equation*}
+și punctele $P(x_1, y_1)$ și $Q(x_2, y_2)$ de pe $E(\mathbb{F}_5)$ și punctul $R(x_3, y_3)$ rezultatul adunării dintre $P$ și $Q$. Algoritmul de adunare a punctelor $P$ și $Q$ este același ca la Teorema \ref{teo:formulaadunare}, doar că operațiile vor fi modulo $p$, nu în $\mathbb{R}$. Observăm că operațiile folosite sunt adunarea, scăderea, înmulțirea și împărțirea asupra coordonatelor punctelor și coeficienților lui $E$. Și cum operațiile folosite sunt închise cu $\mathbb{F}_p$, înseamnă că și rezultatul va fi tot în $\mathbb{F}_p$.
+
+Următorul paragraf este preluat și adaptat din \cite{ref1}.
+\begin{teo}
+Fie o curbă eliptică E peste $\mathbb{F}_p$: 
+\begin{equation*}
+     E : Y^2 = X^3 + aX + b \text{ mod $p$}
+\end{equation*}
+și punctele $P(x_1, y_1)$ și $Q(x_2, y_2)$ de pe $E(\mathbb{F}_p)$.
+\begin{enumerate}[(a)]
+    \item 
+    Algoritmul de adunare a punctelor pe o curbă eliptică (Teorema \ref{teo:formulaadunare}) aplicat pe punctele $P$ și $Q$ rezultă într-un punct în $E(\mathbb{F}_p)$. Notăm acest punct cu $P + Q$.
+    \item
+    Această lege de adunare pe $E(\mathbb{F}_p)$ satisface toate proprietățile enumerate în Teorema \ref{teo:adunaregrupabelian}. Cu alte cuvinte, $E(\mathbb{F}_p)$ cu legea de adunare formează un grup finit.
+\end{enumerate}
+\end{teo}
+% TO DO: de adaugat demonstratie?
+
+\begin{exem}
+Considerăm aceeași curbă eliptică $E$ în $\mathbb{F}_5$ de la \eqref{equation:ec2} și fie punctele $P(0, 1)$ și $Q(2, 3)$ de pe $E(\mathbb{F}_5)$. Folosind algoritmul de adunare a punctelor pe o curbă eliptică (Teorema \ref{teo:formulaadunare}) realizăm $P + Q$, începând cu calculul pănții dreptei:
+\begin{equation*}
+\begin{split}
+     m & = \dfrac {y_2 - y_1} {x_2 - x_1} \\
+     & = \dfrac {2 - 0} {3 - 1} \\
+     & = \dfrac {2} {2} = 1
+\end{split}
+\end{equation*}
+
+În continuare calculăm $\nu$:
+\begin{equation*}
+\begin{split}
+     \nu & = y_1 - mx_1 \\
+     & = 1 - (1 \cdot 0) = 1
+\end{split}
+\end{equation*}
+
+Ne rămâne de calulat doar rezultatul adunării:
+\begin{equation*}
+\begin{split}
+     x_3 & = m^2 - x_1 - x_2 \\
+     & = 1^2 - 0 - 2 \\
+     & = -1 = 4 \\ 
+     y_3 & = -(mx_3 + \nu) \\
+     & = -(1 \cdot 4 + 1) \\
+     & = -5 = 0
+\end{split}
+\end{equation*}
+
+Cum calculăm în $\mathbb{F}_5$, $-1 \equiv 4 \text{ (mod  $5$)}$ și $-5 \equiv 0 \text{ (mod $5$)}$. Deci, rezultatul final este:
+\begin{equation*}
+    P(0, 1) + Q(2, 3) = (4, 0)
+\end{equation*}
+
+Analog, conform teoremei de adunare, putem aduna și $P(0, 1) + P(0, 1)$:
+\begin{equation*}
+\begin{split}
+     m & = \dfrac {3x_1^2} {2y_1} \\
+     & = \dfrac {0^2} {2 \cdot 1} = 0 \\
+     \nu & = y_1 - mx_1 \\
+     & = 1 - (0 \cdot 0) = 1
+\end{split}
+\end{equation*}
+
+Și, în final:
+\begin{equation*}
+\begin{split}
+     x_3 & = m^2 - x_1 - x_2 \\
+     & = 0^2 - 0 - 0 = 0 \\ 
+     y_3 & = -(mx_3 + \nu) \\
+     & = -(0 \cdot 0 + 1) \\
+     & = -1 = 4
+\end{split}
+\end{equation*}
+
+Deci, rezultatul final este:
+\begin{equation*}
+    P(0, 1) + P(0, 1) = (0, 4)
+\end{equation*}
+
+Putem face analog toate adunările din $E(\mathbb{F}_5)$ și ar rezulta:
+\begin{figure} [H]
+    \centering
+    \includegraphics[]{Licenta/capturi/teorie/X^3 + 1 mod 5 adunare.png}
+    \caption{Tabelul de adunare pentru $E : Y^2 = X^3 + 1$ mod $5$}
+    \label{fig:adunarefec1}
+\end{figure}
+\end{exem}
+
+Este evident că mulțimea punctelor din $E(\mathbb{F}_p)$ este finită, numărul maxim de posibilități fiind $p$ pentru $X$ și $p$ pentru $Y$, adică $p^2$ aranjamente. Dar cum ecuația curbei eliptice peste un corp finit este:
+\begin{equation*}
+    E : Y^2 = X^3 + aX + b \text{ mod $p$}
+\end{equation*}
+
+Înseamnă că pentru fiecare $Y$ există maxim 2 valori $X$ care pot exista. Luând în considerare și punctul $O$, ajungem la $\#E(\mathbb{F}_p)$ (cardinalul grupului $E(\mathbb{F}_p)$) are cel mult $2p + 1$ puncte cu tot cu punctul $O$ (punctul la infinit). Acest estimat este doar o margine superioară și este mult mai mare decăt valoarea în practică.
+
+Următorul paragraf este preluat și adaptat din \cite{ref1}.
+
+Când introducem o valoare pentru $X$, există trei posibilități pentru valoarea cantitații:
+\begin{equation*}
+    E : Y^2 = X^3 + aX + b
+\end{equation*}
+
+În primul caz, poate fi un rest pătratic modulo $p$, caz în care are două pătrate și obținem două puncte în $E(\mathbb{F}_p)$. Acest lucru se întâmplă în aproximativ $50\%$ din cazuri. În al doilea rând, poate fi un modulo $p$ nereziduu, caz în care aruncăm $X$. Aceasta se întâmplă și în aproximativ $50\%$ din timp. În al treilea rând, ar putea fi egal cu $0$, caz în care obținem un punct în $E(\mathbb{F}_p)$, dar acest caz se întâmplă foarte rar. Astfel am putea aștepta ca numărul de puncte din $E(\mathbb{F}_p)$ să fie aproximativ:
+\begin{equation*}
+    \#E(\mathbb{F}_p) \approx 50\% \cdot 2p + 1 = p + 1
+\end{equation*}
+
+\begin{teo} \label{teo:thhasse}
+(Hasse) Fie E o curbă eliptică peste $\mathbb{F}_p$, atunci
+\begin{equation*}
+     \#E(\mathbb{F}_p) = p + 1 - t_p \text{ cu } |t_p| \leq 2\sqrt{p}
+\end{equation*}
+\end{teo}
+
+\begin{defi}
+Cantitatea:
+\begin{equation*}
+    t_p = p + 1 - \#E(\mathbb{F}_p) 
+\end{equation*}
+din Teorema \ref{teo:thhasse} se numește urma lui Frobenius pentru $E/(\mathbb{F}_p)$, $t_p$ apare ca urma unei anumite matrice 2 pe 2 care acționează ca o transformare liniară pe un anumit spațiu vectorial bidimensional asociat cu $E(\mathbb{F}_p)$.
+\end{defi}
+
+Următorul exemplu este preluat și adaptat din \cite{ref1}.
+\begin{exem}
+Fie $E$ o curbă eliptică:
+\begin{equation*}
+    E : Y^2 = X^3 + 4X + 6 
+\end{equation*}
+
+Ne putem gândi la $E$ ca la o curbă eliptică peste $\mathbb{F}_p$ pentru diferite corpuri finite $\mathbb{F}_p$ și
+numărăm cardinalul din $E(\mathbb{F}_p)$. Figura \ref{fig:urmafrobenius1} listează rezultatele pentru primele câteva numere prime, împreună cu valoarea lui $t_p$ și, în scop de comparație, a valorii de $2\sqrt{p}$.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.45\textwidth]{Licenta/capturi/teorie/cardinalul si urma lui Frobenius pt X^3 + 4X + 6.png}
+    \caption{Cardinalul si urma lui Frobenius pentru $E : Y^2 = X^3 + 4X + 6$}
+    \label{fig:urmafrobenius1}
+\end{figure}
+\end{exem}
+
+Următorea remarcă este inspirată din \cite{ref1}.
+\begin{rem}
+Teorema lui Hasse (Teorema \ref{teo:thhasse}) oferă doar o limită superioară pentru $\#E(\mathbb{F}_p)$, ci nu oferă o metodă de calcul a acesteia. În principiu, se poate realiza "brut force", adică a se înlocui fiecare valoare a lui $X$ din intervalul $\bigr[0, 1, \cdots p - 1\bigr]$ și verificat rezultatul ecuației curbei (adică $Y^2$) față de un tabel precalculat cu toate pătratele modulo $p$. Acest proces ar dura $O(p)$ (timp liniar față de numărul prim $p$), deci este foarte ineficient. Schoof a găsit un algoritm pentru a calcula $\#E(\mathbb{F}_p)$ în $O((log p)^6)$ (un algoritm de timp polinomial). Algoritmul lui Schoof a fost îmbunătățit și făcut practic de Elkies și Atkin, așa că acum este cunoscut ca algoritmul SEA (după inițialele celor trei).
+\end{rem}
+
+Acest capitol a avut ca scop sumarizarea conceptelor de bază a curbelor eliptice pentru aplicarea acestora în criptografie. Există multe articole și cărți ce explică teoria și concepte mai avansate, câteva exemple fiind: \cite{ref4}, \cite{ref5}, \cite{ref6}, \cite{ref7}, \cite{ref8}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Preliminarii și concepte de bază în Criptografie}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problema logaritmului discret (DLP)}
+
+Problema logaritmului discret, sau mai bine cunoscută după numele din engleză: Discrete Logarithm Problem (DLP) apare în multe probleme matematice, însă, pentru cubele eliptice apare cel mai des peste corpuri finite $\mathbb{F}_p$ ($\mathbb{F}_p$ fiind un corp comutativ, iar $p$ fiind un număr prim). Prima carte publicată ce abordează construirea de chei publice se bazează pe problema logaritmului discret peste corpuri finite $\mathbb{F}_p$ și a fost realizată de Diffie și Hellman \cite{ref3} (acești autori consacrați sunt și cei după care a fost numit algoritmului de schimb de chei Diffie-Hellman).
+
+Reamintim "mica" Teoremă a lui Fermat și Teorema rădăcinii primitive.
+Cele trei exemple legate de mica Teorema lui Fermat și Teorema rădăcinii primitive au fost preluate din \cite{ref1}.
+
+\begin{teo} \label{teo:thfermat}
+(Mica Teoremă a lui Fermat) Fie $p$ un număr prim si a un număr întreg, atunci
+\begin{equation*}
+      a^{p-1} \equiv
+        \left\{
+        	\begin{array}{ll}
+        		1 \text{ (mod $p$)}  & \mbox{dacă } p \nmid a \\
+        		0 \text{ (mod $p$)}  & \mbox{dacă } p \mid a 
+        	\end{array}
+        \right.
+\end{equation*}
+\end{teo}
+
+\begin{exem}
+Fie numărul prim $p = 15485863$, deci Teorema \ref{teo:thfermat} ne spune că
+\begin{equation*}
+    2^{15485862} \equiv 1 \text{ (mod $15485863$)}
+\end{equation*}
+
+Astfel, fără a face niciun calcul putem să determinăm că numărul $2^{15485862} - 1$, ce are aproximativ $4661709$ de cifre (pentru determinarea numărului de cifre am folosit \href{https://www.had2know.org/academics/compute-number-digits-exponents-calculator.html}{acest calculator}), este multiplu al numărului $15485863$.
+\end{exem}
+
+\begin{rem}
+\begin{enumerate}[(a)]
+    \item Din exemplul anterior observăm că oricât de mare ar fi un număr prim $p$, putem să determinăm un multiplu al său, acesta fiind:
+    \begin{equation*}
+        2^p - 1
+    \end{equation*}
+    
+    \item Acesta remarcă este preluată din \cite{ref1}. Folosind mica Teoremă a lui Fermat și algoritmul de ridicat rapid la putere, putem să determinăm eficient inverselele modulo-ului $p$, adică
+    \begin{equation*}
+        a^{p - 2} \equiv a^{-1} \text{ (mod $p$)}
+    \end{equation*}
+    Putem demonstra a doua remarcă înmulțind de ambele părți cu $a$ și obținem mica Teoremă a lui fermat $a^{p-1} \equiv 1 \text{ (mod $p$)}$.
+\end{enumerate}
+\end{rem}
+
+\begin{exem}
+Fie numărul prim $p = 17449$ și numărul 7814. Putem calcula inversa lui $7814$ modulo $17449$ folosind remarca anterioară:
+\begin{equation*}
+    7814^{17447} \equiv 7814^{-1} \equiv 1284 \text{ (mod $17449$)}
+\end{equation*}
+
+\end{exem}
+
+\begin{teo} \label{teo:thradaciniiprimitive}
+(Teorema rădăcinii primitive) Fie $p$ un număr prim, există un element $g \in \mathbb{F}_p^*$, astfel încăt puterile lui $g$ generează fiecare element al lui $\mathbb{F}_p^*$.
+\begin{equation*}
+      \mathbb{F}_p^* = \bigl\{1, g, g^2, ..., g^{p-2} \bigr\}
+\end{equation*}
+
+Elementele cu această proprietate se denumesc rădăcinini primitive ale lui $\mathbb{F}_p$ sau generatoare (baze) ale $\mathbb{F}_p$. Ele sunt elemente ale mulțimii finite $\mathbb{F}_p^*$, având ordinul $p - 1$.
+\end{teo}
+
+\begin{exem}
+Corpul finit $\mathbb{F}_{11}$ îl are pe $2$ ca generator, deoarece în $\mathbb{F}_{11}$
+\begin{equation*}
+\begin{split}
+    & 2^0 = 1 \; \; 2^1 = 2 \; \; 2^2 = 4 \; \; 2^3 = 8 \\
+    & 2^4 = 5 \; \; 2^5 = 10 \; \; 2^6 = 9 \; \; 2^7 = 7 \\
+    & 2^8 = 3 \; \; 2^9 = 6
+\end{split}
+\end{equation*}
+
+Deoarece toate elementele nenule ale mulțimii $\mathbb{F}_{11}$ au fost generate din puteri ale lui $2$. Însă corpul finit $\mathbb{F}_{17}$ nu îl are pe $2$ ca generator, deoarece în $\mathbb{F}_{17}$
+\begin{equation*}
+\begin{split}
+    & 2^0 = 1 \; \; 2^1 = 2 \; \; 2^2 = 4 \; \; 2^3 = 8 \\
+    & 2^4 = 16 \; \; 2^5 = 15 \; \; 2^6 = 13 \; \; 2^7 = 9 \\
+    & 2^8 = 1
+\end{split}
+\end{equation*}
+
+Observăm că $2^0 = 2^8 = 1$, deci nu putem crea toate elementele nenule ale mulțimii $\mathbb{F}_{17}$.
+\end{exem}
+
+Demonstrațiile acestor teoreme (Teorema lui Fermat și Teorema rădăcinii primitive) sunt mai complexe și sunt prezentate și detaliate în amănunt în cărtea \cite{ref9}.
+
+\begin{defi} \label{defi:pblogdiscret}
+(Problema logaritmului discret) Fie $g$ o rădăcină primă a $\mathbb{F}_p$ și $h \in \mathbb{F}_p^*$. Problema logaritmului discret este problema identificării exponentului $x$ astfel încât
+\begin{equation*}
+      g^x \equiv h \text{ (mod $p$)}
+\end{equation*}
+
+Numărul $x$ se numește logaritmul discret al lui $h$ cu baza în $g$ și se notează $log_g(h)$.
+\end{defi}
+
+Acest paragraf a fost preluat și adaptat din \cite{ref1}.
+\begin{rem}
+\begin{enumerate}[(a)]
+    \item Fie $g$ o rădăcină primă a $\mathbb{F}_p$, cu $p$ număr prim și $h \in \mathbb{F}_p^*$, problema logaritmului discret presupune identificarea numărului $x$ pentru ca $g^x \equiv h \text{ (mod $p$)}$. Conform micii Teoreme a lui Fermat (Teorema \ref{teo:thfermat}) avem $g^{p - 1} \equiv 1 \text{ (mod $p$)}$, ceea ce înseamnă ca dacă înmulțim $g^x$ cu $g$ ridicat la un multiplu de $(p - 1)$ rezutatul va fi tot $h$. Mai exact, dacă $x$ este soluția căutată, atunci și $x + k(p - 1)$ cu $k \in \mathbb{Z}^*$ este o soluție. Adică
+    \begin{equation*}
+    \begin{split}
+        g^{x + k(p - 1)} & = g^x \cdot g^{k \cdot (p - 1)} \\ 
+        & = g^x \cdot (g^{(p - 1)})^k \\ 
+    \end{split}
+    \end{equation*}
+    \begin{equation*}
+      g^x \cdot (g^{(p - 1)})^k \equiv h \cdot 1^k \equiv h \text{ (mod $p$) pentru orice } k \in \mathbb{Z}^*
+    \end{equation*}
+
+    De aceea precizăm că ne referim la soluția logaritmului discret ca fiind $x$-ul din intervalul $[0, ... p - 2]$.
+    
+    \item Este rezonabil să ne referim la $log_g$ ca fiind un „logaritm”, deoarece traduce înmulțirea în adunare în același mod ca și funcția normală de logaritm.
+\end{enumerate}
+\end{rem}
+
+\begin{defi} \label{defi:pb_log_discret_grup}
+Fie $G$ un grup a cărei lege de compoziție o notăm ca fiind $\star$. Problema logaritmului discret pentru grupul $G$ este problema identificării, pentru orice două elemente $h$ și $g$ cu $h, g \in G$, numărul întreg $x$ astfel încât
+\begin{equation*}      
+     \underbrace{g \star g \star g \star ... \star g}_\text{x times} = h
+\end{equation*}
+\end{defi}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Schimbul de chei Diffie–Hellman}
+
+În istoria comunicațiilor secrete, crearea criptografiei cu cheie publică de către Diffie și Hellman în 1976 și urmat de criptosistemul cu chei publice RSA (după inițialele autorilor) realizat de Rivest, Shamir și Adleman în 1978, sunt momente definitorii. Semnificația criptosistemelor cu chei publice și a protocoalelor de semnătură digitală pe care le suportă este greu de estimat în era curentă a computerelor și a internetului.
+
+Unul din obiectivele principale al criptografiei (cu cheia publică)
+este de a permite ca două persoane să facă schimb de informații confidențiale, chiar dacă nu s-au întâlnit niciodată și pot comunica doar prin intermediul unui canal care este monitorizat de un adversar. Adică de a putea comunica pe un canal nesigur, fără necesitatea întâlnirii anterioare.
+
+Înainte vom defini câteva notații pe care le fom folosi de acum înainte în cadrul acestei lucrări. Persoanele ce doresc să communice între ele le vom denumi Alice (va fi notată cu $A$) și Bob (va fi notat cu $B$). iar adversarul, cel ce doreșste să determine mesajul trimis o vom numi Eve (va fi notată cu $E$).
+
+Codurile și cifrurile până de curând s-au bazat pe premisa că părțile care încercau să comunice (Bob și Alice) au împărtășit o cheie secretă pe care inamicul lor, adică Eve, nu o știe. Bob și-ar cripta mesajul folosind cheia secretă și Alice l-ar decripta folosind aceeași cheie secretă, iar Eve nu putea să realizeze decriptarea mesajului, deorece nu are acces la cheia secretă. Totuși există un mare dezavantaj la criptosistemele cu cheie privată, și acela este că Alice și Bob trebuie să stabilească cheia secretă a priori conversației.
+
+Acesta este și avantajul principal al criptografiei cu cheie publică, Alice și Bob pot comunica pe un canal nesigur, chiar dacă nu au avut contact direct înainte. Aceste criptosisteme se bazează pe probleme grele din matematică, precum problema logaritmului discret studiată anterior, pentru a asigura securitatea comunicării. Mai precis, se bazează pe probleme ce este foarte complicat de rezolvat fără nicio informații suplimentare, dar care se pot rezolva ușor cu date suplimentare.
+
+Diffie și Hellman au folosit dificultatea problemei logaritmului discret peste $\mathbb{F}_p^*$ a realiza schimbul de chei între cei ce comunică.
+
+Schimbul de chei Diffie-Hellman este un protocol criptografic care permite celor două părți participante să stabilească o cheie secretă partajată pe un canal de comunicare nesigur. A fost introdus de Whitfield Diffie și Martin Hellman și este utilizat pe scară largă pentru stabilirea securizată a cheilor în diferite sisteme criptografice. Vom determina importanța existenței acestui algoritm în capitolele viitoare în cadrul criptografiei bazate pe curbe eliptice.
+
+
+Acesta este algoritmul ce se aplică pentru schimbul de chei Diffie-Hellman:
+\begin{enumerate}[(1)]
+    \item Configurare: cele două părți ce comunicare, Alice și Bob, convin asupra anumitor parametri: 
+    \begin{itemize}
+     \item un număr prim foarte mare pe care  o să-l notăm cu $p$
+     \item un număr întreg nenul $g$ modulo $p$
+     \begin{description}
+     \item[notă:] numărul $g$ ar trebui să fie ales astfel încăt ordinul său în $\mathbb{F}_p^*$ să fie un număr prim mare
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $p$ și $g$
+     \end{description}
+   \end{itemize}
+
+   \item Alegerea numerelor secrete: 
+   \begin{itemize}
+     \item Alice alege un număr întreg secret $a$ pe care nu-l împărtașește cu nimeni și calculează
+     \begin{equation*}
+      A \equiv g^a \text{ (mod $p$)}
+    \end{equation*}
+    
+     \item Bob alege un număr întreg secret $b$ pe care nu-l împărtașește cu nimeni și calculează
+     \begin{equation*}
+      B \equiv g^b \text{ (mod $p$)}
+    \end{equation*}
+   \end{itemize}
+
+   \item Schimbul de chei secrete: Alice îi trimite $A$ lui Bob si Bob îi trimite $B$ lui Alice pe canalul neprivat:
+   \begin{itemize}
+     \item Alice își folosește numărul secret și calculează
+     \begin{equation*}
+      A' \equiv B^a \text{ (mod $p$)}
+    \end{equation*}
+    
+     \item Bob își folosește numărul secret și calculează
+     \begin{equation*}
+      B' \equiv A^b \text{ (mod $p$)}
+    \end{equation*}
+    \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $A$ și $B$
+     \end{description}
+   \end{itemize}
+
+   \item Cheie secretă comună rezultată: valorile pe care le calculează sunt egale și reprezintă cheia comună:
+   \begin{equation*}
+      A' \equiv B^a \equiv (g^b)^a \equiv g^{ab} \equiv (g^a)^b \equiv A^b \equiv B' \text{ (mod $p$)}
+    \end{equation*}
+\end{enumerate}
+
+Schimbul de chei Diffie-Hellman este sumarizat în Figura \ref{fig:schimb_chei_diffie_hellman}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{Licenta/capturi/teorie/Schimbul de chei Diffie-Hellman.png}
+    \caption{Schimbul de chei Diffie-Hellman}
+    \label{fig:schimb_chei_diffie_hellman}
+\end{figure}
+
+Datele din exemplul următor au fost preluate din \cite{ref1}.
+\begin{exem}
+Vom urma pașii din algoritmul prezentat anterior.
+
+Pasul 1, Alice și Bob stabilesc numărul $p = 941$ și rădăcina primitivă $g = 627$.
+
+Pasul 2, Alice alege numărul întreg secret $a = 347$ și calculează
+\begin{equation*}
+    A = 390 \equiv 627^{347} \text{ (mod $941$)}
+\end{equation*}
+
+Analog, Bob alege numărul întreg secret $b = 781$ și calculează
+\begin{equation*}
+    B = 691 \equiv 627^{781} \text{ (mod $941$)}
+\end{equation*}
+
+Pasul 3, Alice îi trimite 390 ($A$) lui Bob și Bob îi trimite 691 ($B$) lui Alice pe canalul nesecurizat.
+
+Alice își folosește numărul secret și calculează
+\begin{equation*}
+    A' = 470 \equiv 691^{347} \text{ (mod $941$)}
+\end{equation*}
+    
+Bob își folosește numărul secret și calculează
+\begin{equation*}
+    B' = 470 \equiv 390^{781} \text{ (mod $941$)})
+\end{equation*}
+
+Pasul 4, Alice și Bob au obținut cheia secretă comună
+\begin{equation*}
+    470 \equiv 627^{390 \cdot 781} \equiv A^b \equiv B^a \text{ (mod $941$)}
+\end{equation*}
+\end{exem}
+
+Eve are acces la următoarele date: $941(f)$, $627(g)$, $390(A)$ și $691(B)$. Ceea ce înseamnă ca dacă Eve dorește să determine cheia secretă comună a lui Alice și Bob, aceasta trebuie să rezolve una din cele două congruențe pentru a determina numărul secret $a$ al lui Alice sau $b$ al lui Bob:
+\begin{equation*}
+\begin{split}
+    627^{a} & \equiv 390 \text{ (mod $941$)} \\ 
+    627^{b} & \equiv 691 \text{ (mod $941$)} 
+\end{split}
+\end{equation*}
+
+Observăm că ecuațiile anterioare reprezintă problema logaritmului discret (în Definiția \ref{defi:pblogdiscret}). Pentru a găsi rezolvarea, Eve trebuie să dea "brute force", încercând toate puterile lui $627$ modulo $941$ pentru a găsi una din cele două congruențe. În practică, în 2008 se recomanda ca $p$ să aibă mai mult $1000$ de cifre în compoziția sa și $g$ să aibă ordin un număr prim aproximativ jumătate din $p$, pentru a îngreuna rezolvarea problemei logaritmului discret prin luarea tuturor valorilor.
+
+Astfel, problema logaritmului discret oferă securitate schimbului de chei Diffie-Hellman.
+
+Dacă Eve nu poate rezolva problema logaritmului discret, ar părea că Alice și Bob sunt în siguranță, dar acest lucru nu este neapărat adevărat. Rezolvarea problemei logaritmului discret este o modalitate de a determina valoarea comună a lui Alice și Bob, dar aceasta nu este problema specifică pe care Eve vrea să o rezolve, aceasta încercâd să determine valoarea $g^{ab} \text{ (mod $p$)}$. Securitate cheii comune transmise între Alice și Bob este dată de dificultatea cu care se rezolvă următoarea problemă, ce este potențial mai ușoară.
+
+\begin{defi} \label{defi:pb_diffie_hellman}
+(Problema Diffie-Hellman) Fie $p$ un număr prim și $g$ un număr întreg. Problema Diffie-Hellman, sau Diffie–Hellman Problem (DHP) în engleză, este problema determinării valorii $g^{ab} \text{ (mod $p$)}$ cunoscând $g^a \text{ (mod $p$)}$ și $g^b \text{ (mod $p$)}$.
+\end{defi}
+
+\begin{rem}
+Presupunem că există un algoritm eficient care să rezolve Problema Diffie-Hellman, momentan nu se știe dacă se poate folosi acest algoritm pentru a rezolva eficient problema logaritmului discret.
+\end{rem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Criptosistemul cu cheie publică ElGamal}
+
+Chiar dacă din punct de vedere istoric, RSA a fost primul criptosistem cu cheie publică, dezvoltarea naturală a unui criptosistem în urma lucrării realizate de Diffie și Hellman (Lucrarea \cite{ref3}) este un sistem descris de Taher ElGamal în 1985 în \cite{ref10}. Algoritmul ElGamal pentru criptarea de chei publice se bazează pe problema logaritmului discret și se aseamănă cu schimbul de chei Diffie-Hellman prezentat în subcapitolul anterior. În continuare vom detalia criptosistemul cu cheie publică El Gamal ce se bazează pe problema logaritmului discret pe $\mathbb{F}_p^*$.
+
+Acesta este algoritmul dacă Bob dorește să-i trimită un mesaj lui Alice:
+\begin{enumerate}[(1)]
+    \item Configurare: se stabilesc parametrii publici: 
+    \begin{itemize}
+     \item un număr prim foarte mare pe care  o să-l notăm cu $p$
+     \item un număr întreg nenul $g$ modulo $p$
+     \begin{description}
+     \item[notă:] numărul $g$ ar trebui să fie ales astfel încăt ordinul său în $\mathbb{F}_p^*$ să fie un număr prim mare
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $p$ și $g$
+     \end{description}
+   \end{itemize}
+
+   \item Crearea cheii secrete: 
+   \begin{itemize}
+     \item Alice alege o cheie secretă $a$ din intervalul $[1, 2, ..., p - 1]$ pe care nu-l împărtașește cu nimeni
+     \item Alice calculează cheia publică $A$
+     \begin{equation*}
+        A = g^a \text{ (mod $p$)}
+    \end{equation*}
+    \item Alice își publică cheia publică
+   \end{itemize}
+
+   \item Criptarea:
+   \begin{itemize}
+     \item Bob alege mesajul $m$ pe care dorește să-l trmită
+     \item Bob alege o cheie aleatore temporală $k$
+     \item Bob folosește cheia publică a lui Alice pentru a calcula
+     \begin{equation*}
+     \begin{split}
+        c_1 & = g^k \text{ (mod $p$)} \\
+        c_2 & = mA^k \text{ (mod $p$)}
+    \end{split}
+    \end{equation*}
+    
+     \item Bob îi trimtie mesajul criptat $(c_1, c_2)$ lui Alice
+    \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $(c_1, c_2)$
+     \end{description}
+   \end{itemize}
+
+   \item Decriptarea:
+   \begin{itemize}
+    \item Alice calculează
+    \begin{equation*}
+        (c_1^a)^{-1} \cdot c_2 \text{ (mod $p$)}
+     \end{equation*}
+     \item rezultatul obținut este $m$
+    \end{itemize}
+\end{enumerate}
+
+Algoritmul ElGamal pentru creare de chei, criptare și decriptare este sumarizat în Figura \ref{fig:alg_elgamal}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width =0.7\textwidth]{Licenta/capturi/teorie/algoritmul ElGamal pentru creare chei, criptare si decriptare.png}
+    \caption{Algoritmul ElGamal pentru creare de chei, criptare și decriptare}
+    \label{fig:alg_elgamal}
+\end{figure}
+
+Arătăm că rezultatul ecuației $(c_1^a)^{-1} \cdot c_2 \text{ (mod $p$)}$ obținut de Alice chiar este mesajul $m$
+\begin{equation*}
+ \begin{split}
+    (c_1^a)^{-1} \cdot c_2  & \equiv (g^{ak})^{-1} \cdot (mA^k)\text{ (mod $p$)} \\
+    & \equiv (g^{ak})^{-1} \cdot (m(g^a)^k) \text{ (mod $p$)} \\
+    & \equiv (g^{ak})^{-1} \cdot g^{ak} \cdot m \text{ (mod $p$)} \\
+    & \equiv m \text{ (mod $p$)}
+\end{split}
+\end{equation*}
+
+Datele din exemplul următor au fost preluate din \cite{ref1}.
+\begin{exem}
+Vom urma pașii din algoritmul prezentat anterior.
+
+Pasul 1, se stabilesc $p = 467$ și rădăcina primitivă $g = 2$.
+
+Pasul 2, Alice alege numărul întreg secret $a = 153$ și calculează
+\begin{equation*}
+    A = 224 \equiv 2^{153} \text{ (mod $467$)}
+\end{equation*}
+Alice anunță cheia publică $A$
+
+Pasul 3, Bob alege mesajul $m = 331$, cheia aleatoare temporală $k = 197$ și criptează mesajul
+\begin{equation*}
+ \begin{split}
+    c_1 & = 87 \equiv 2^{197} \text{ (mod $467$)} \\
+    c_2 & = 57 \equiv 331 \cdot 224^{197} \text{ (mod $467$)}
+\end{split}
+\end{equation*}
+Bob îi trimite lui Alice mesajul criptat $(c_1, c_2) = (87, 57)$.
+
+Pasul 4, Alice decriptează mesajul primit de la Bob
+\begin{equation*}
+ \begin{split}
+    (c_1^a)^{-1} \cdot c_2 & \equiv (87^{153})^{-1} \cdot 57 \text{ (mod $467$)} \\
+    & \equiv 367^{-1} \cdot 57 \text{ (mod $467$)} \\
+    & \equiv 14 \cdot 57 \equiv 331 \text{ (mod $467$)}
+\end{split}
+\end{equation*}
+\end{exem}
+
+Eve cunoaște următoarele date: numărul prim $p$, rădăcina primitivă $g$, cheia publică $A$ și mesajul criptat $(c_1, c_2)$. Dacă Eve dorește să afle mesajul decriptat $m$ pe care Bob i l-a trimis lui Alice, atunci Eve trebuie să rezolve $A \equiv g^a \text{ (mod $p$)}$. Observăm că Eve trebuie să rezolve problema logaritmului discret ca să determine valorea mesajului transmis .
+
+\begin{rem}
+În criptosistemul de chei publice ElGamal, mesajul inițial $m$ pe care Bob dorește să-l trimită lui Alice este un număr din intervalul $[2, 3, ..., p - 1]$. Numerele din componența mesajului criptat $c_1$ și $c_2$ sunt tot din intervalul $[2, 3, ..., p - 1]$ și de o lungime asemănătoare cu $m$. Astfel, pentru fiecare mesaj pe care Bob dorește să-l trimită lui Alice lungimea textului criptat va fi aproximativ de două ori mai mare. De aceea, spunem că ElGamal are o expansiune a mesajului inițial de $2 \: la \:  1$. 
+\end{rem}
+
+Legat de securitatea criptosistemului ElGamal, am vrea ca acesta să fie cel puțin la fel de greu de atacat de către Eve ca Problema Diffie-Hellman (Problema \ref{defi:pb_diffie_hellman}). Adică, mai exact am vrea să demonstrăm că dacă Eve poate sparge criposistemul ElGamal, aceasta poate rezolva Problema Diffie-Hellman.
+
+Următoarea propoziție și demonstrație au fost preluate și adaptate din \cite{ref1}.
+
+\begin{prop}
+Fie un număr prim $p$ și o rădăcină $g$ pe care le folosim pentru crpitarea ElGamal. Să presupunem că Eve are acces la un oracol care decriptează ElGamal texte cifrate criptate arbitrare folosind chei publice arbitrare ElGamal. Atunci ea poate folosi oracolul pentru a rezolva Problema Diffie–Hellman (Problema \ref{defi:pb_diffie_hellman}).
+\end{prop}
+
+\begin{proof}
+În loc să oferim o demonstrație clasică, vom vorbi mai mult și vom explica cum s-ar putea aborda problema utilizării unui oracol ElGamal pentru a rezolva Problema Diffie–Hellman. Reamintim că în Problema Diffie–Hellman, Evei i se dau cele două valori
+\begin{equation*}
+ \begin{split}
+    A & \equiv g^a \text{ (mod $p$)} \\
+    B & \equiv g^b \text{ (mod $p$)}
+\end{split}
+\end{equation*}
+
+Și i se cere să determine valoarea $g^{ab} \text{ (mod $p$)}$. Eve cunoaște ambele valori ale lui $A$ și $B$, dar nu cunoaște niciuna dintre valorile valorile $a$ și $b$.
+
+Presupunem că Eve poate consulta un oracol ElGamal. Asta înseamnă că Eve poate trimite oracolului un număr prim $p$, o bază $g$, o cheie publică $A$ și un text cifrat $(c1, c2)$. Oracolul revine răspunde cu $m$, adică returnează valoarea
+\begin{equation*}
+    (c_1^a)^{-1} \cdot c_2  \text{ (mod $p$)}
+\end{equation*}
+
+Dacă Eve alege să-i dea oracolului inputul $c_1 = B = g^b$ și $c_2 = 1$, atunci oracolul o să returneze $(g^{ab})^{-1} \text{ (mod $p$)}$, din care se poate determina din inversă $(g^{ab})\text{ (mod $p$)}$, rezolvând Problema Diffie-Hellman.
+
+Dar în cazul în care oracolul este suficient de inteligent pentru a ști că nu ar trebui să decripteze niciodată texte cifrate care au $c_2 = 1$, Eve poate încă păcăli oracolul trimițându-i texte cifrate aleatorii, după cum urmează. Ea alege o valoare arbitrară pentru $c_2$ și îi dă oracolului cheia publică $A$ și textul cifrat $(B,c_2)$. Oracolul îi returnează presupusul text clar $m$ care satisface
+\begin{equation*}
+ \begin{split}
+    m & \equiv (c_1^a)^{-1} \cdot c_2  \text{ (mod $p$)} \\
+    & \equiv (B^a)^{-1} \cdot c_2 \text{ (mod $p$)} \\
+    & \equiv (g^{ab})^{-1} \cdot c_2 \text{ (mod $p$)}
+\end{split}
+\end{equation*}
+
+După răspunsul oracolului cu valoarea $m$, Eve calzulează 
+\begin{equation*}
+    m^{-1} \cdot c_2 \equiv g^{ab} \text{ (mod $p$)}
+\end{equation*}
+pentru a găsi valoarea lui $g^{ab} \text{ (mod $p$)}$. Este de remarcat faptul că, deși, cu ajutorul oracolului, Eve a calculat $g^{ab} \text{ (mod $p$)}$, a făcut-o fără cunoașterea valorii lui $a$ sau $b$, așa că a rezolvat doar Problema Diffie-Hellman, nu și Problema logaritmului discret.
+\end{proof}
+
+\begin{defi}
+Un atac în care Eve are acces la un oracol care decriptează texte cifrate arbitrare sunt cunoscute ca un "chosen ciphertext attack". 
+\end{defi}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Criptografia pe curbe eliptice}
+
+În comparație cu alte metode criptografice, curbele eliptice au o serie de avantaje, cum ar fi dimensiuni reduse ale cheilor, calcule mai rapide și securitatea mai bună. Aceste beneficii fac din criptografia pe curbe eliptice o alegere excelentă pentru operații criptografice eficiente și sigure în diverse aplicații, cum ar fi comunicarea securizată, criptarea și semnăturile digitale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problema logaritmului discret pe curbe eliptice (ECDLP)}
+
+Problema logaritmului discret pe curbe eliptice, sau Elliptic Curve Discrete Logarithm Problem (ECDLP) în engleză, este o problemă matematică ce formează baza securității pentru criptografia pe curbe eliptice. Rezolvarea problemei logaritmului discret pe curbe eliptice este considerată dificilă din punct de vedere computațional, ceea ce este esențial pentru securitatea algoritmilor criptografici bazați pe curbe eliptice, cum ar fi schimburile de chei (de exemplu, schimbul de chei Diffie-Hellman pe curbe eliptice), schemele de criptare (de exemplu, criptosistemul ElGamal) și semnăturile digitale (de exemplu, ECDSA).
+
+Am prezentat bazele problemei logaritmului discret în capitolul 2 (Definițiile \ref{defi:pblogdiscret} și \ref{defi:pb_log_discret_grup}). Pentru a crea un criptosistem bazat pe problema logaritmului discret peste corpul finit $\mathbb{F}_p^*$ adaptăm problema logaritmului discret inițială astfel, Alice publică două numere $g$ și $h$, cu $g, h \in \mathbb{Z}^*$ și exponentul secret $x$ pentru care
+\begin{equation*}
+    g^x \equiv h \text{ (mod $p$)}
+\end{equation*}
+
+Sau dacă explicităm ecuația
+\begin{equation*}      
+     \underbrace{g \cdot g \cdot g \cdot ... \cdot g}_\text{x times} \equiv h \text{ (mod $p$)}
+\end{equation*}
+
+Aceasta este ecuația pe care Eve trebuie să o rezolve pentru a compromite sistemul.
+
+Adaptăm problema logaritmului discret pentru a putea fi folosită pe curbe eliptice. Fie curba eliptică $E$ peste corpul finit $\mathbb{F}_p$ și grupul de puncte $E(\mathbb{F}_p)$ al acestei curbe. Alice publică doua puncte $P(x_1, y_1)$ și $Q(x_2, y_2)$ cu $P, Q \in E(\mathbb{F}_p)$ și numărul întreg $n$ pentru care
+\begin{equation*}      
+     Q = \underbrace{P + P + P + ... + P}_\text{n adunări de puncte pe curba eliptică E} = nP
+\end{equation*}
+
+În această ecuție, Eve trebuie să afle de câte ori $P$ trebuie adunat cu el însuși pentru a obține $Q$.
+
+\begin{defi} \label{defi:pb_log_discret_pe_ec}
+(Problema logaritmului discret peste curbe eliptice) Fie $E$ o curbă eliptică peste corpul finit $\mathbb{F}_p$ și fie punctele $P(x_1, y_1)$ și $Q(x_2, y_2)$ cu $P, Q \in E(\mathbb{F}_p)$. Problema logaritmului discret peste curbe eliptice, sau Elliptic Curve Discrete Logarithm Problem (ECDLP) în engleză, este problema identificării numărului întreg $n$ astfel încât
+\begin{equation*}
+      Q = nP
+\end{equation*}
+
+Analog cu problemei logaritmului discret peste $\mathbb{F}_p^*$, notăm $n$ ca fiind
+\begin{equation*}
+     n = log_P(Q)
+\end{equation*}
+
+Numărul întreg $n$ se numește logaritmul discret eliptic al lui $Q$ în raport cu $P$.
+\end{defi}
+
+Acest paragraf a fost preluat și adaptat din \cite{ref1}.
+\begin{rem}
+\begin{enumerate}[(a)]
+    \item Definiția pentru $log_P(Q)$ nu este tocmai precisă. Este posibil să existe tupluri de puncte $P, Q \in E(\mathbb{F}_p)$ pentru care $Q$ să nu fie un multiplu de $P$. În acest caz funcția $log_P(Q)$ nu este definită (asta ar fi însemnat ca toate punctele să fie de ordin $p$). Totuși, din punct de vedere criptografic, inițial, Alice alege punctul public $P$ și numărul secret $n$ și publică punctul $Q = nP$. În acest caz $log_P(Q)$ există mereu.
+
+    \item Există mai multe valori ale numărului $n$ pentru care $Q = nP$. Definim cel mai mic număr întreg pozitiv $s$ ($s \in \mathbb{Z}_+^*$) pentru care $sP = O$ ca fiind ordinul punctului $P$. Fie $n_0$ un punct pentru care $Q = n_0P$, atunci
+    \begin{equation*}
+    \begin{split}
+        (n_0 + is)P & = n_0P + isP \\ 
+        & = n_0P + O \\ 
+        & = Q \text{ pentru orice } i \in \mathbb{Z}^*
+    \end{split}
+    \end{equation*}
+    
+    \item Considerând remarca anterioară, putem spune că $log_P(Q)$ este un element din  $\mathbb{Z} / s\mathbb{Z}$, deoarece $log_P(Q)$ este un număr întreg modulo $s$. Avantajul pentru a defini valaorea în $\mathbb{Z} / s\mathbb{Z}$ este că logaritmul discret eliptic satisface egalitatea
+    \begin{equation*}
+       log_P(Q_1 + Q_2) = log_P(Q_1) + log_P(Q_2) \text{ pentru orice } (Q_1, Q_2) \in E(\mathbb{F}_p)
+    \end{equation*}
+\end{enumerate}
+\end{rem}
+
+Datele din exemplul următor au fost preluate din \cite{ref1}.
+\begin{exem}
+Fie curba eliptică
+\begin{equation*}
+    E : Y^2 = X^3 + 8X + 7 \text{ peste } \mathbb{F}_{73}
+\end{equation*}
+
+Și punctele $P = (32, 53)$ și $Q = (39, 17)$, cu $P, Q \in E(\mathbb{F}_{73})$. Calculăm
+\begin{equation*}
+     Q = 11P \Rightarrow log_P(Q) = 11
+\end{equation*}
+
+Analog,  punctele $R = (35, 47)$ și $S = (58, 4)$, cu $R, S \in E(\mathbb{F}_{73})$. Calculăm
+\begin{equation*}
+\begin{split}
+    R = 37P \Rightarrow log_P(R) = 37 \\
+    S = 28P \Rightarrow log_P(S) = 28
+\end{split}
+\end{equation*}
+
+Menționăm că $\#E(\mathbb{F}_{73}) = 82$, dar $P$ satisface $41P = O$. Adică, $P$ are ordinul $41 = \dfrac{82}{2}$, deci doar jumătate din punctele din $E(\mathbb{F}_{73})$ sunt multipli ai lui $P$. De exemplu, punctul $(20, 65)$ este în $E(\mathbb{F}_{73})$, dar nu este un multiplu al lui $P$.
+
+\end{exem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Securitatea oferită de ECDLP}
+
+Securitatea oferită de problema logaritmului discret pe curbe eliptice este un aspect esențial al criptografiei pe curbe eliptice, fără de care acest domeniu nu ar putea exista. Problema logaritmului discret pe curbe eliptice poate fi cosniderat fundația pentru securitatea multor algoritmi criptografici bazați pe curbe eliptice, cum ar fi schimburile de chei (de exemplu, schimbul de chei Diffie-Hellman pe curbe eliptice), schemele de criptare (de exemplu, criptosistemul ElGamal) și semnăturile digitale (de exemplu, ECDSA).
+
+Cel mai rapid algoritm cunoscut momentan pentru rezolvarea problemei logaritmului discret pe curbe eliptice durează aproximativ $\sqrt{o}$ pași, unde $o$ este ordinul curbei eliptice.  Dar din teorema lui Hasse (teorema \ref{teo:thhasse}) $o \approx p + 1$.
+
+Pentru a prezenta securitatea acestei probleme vom lua un exemplu. Considerăm că avem o curbă eliptică modulo un număr pe $256$ de biți, atunci conform teorei lui Hasse și ordinul va fi tot aproximativ un număr pe $256$ de biți. Extragem radicalul din acest număr și va rezulta un număr pe aproximativ $128$ de biți, care va fi $\sqrt o \approx 10^{37}$. Un CPU de un GHz are o putere de procesare de un miliard de operații pe secundă, ceea ce înseamnă că ar dura $10^{37} / 10^9 = 10^{28}$ secunde pentru a sparge ECDLP. Convertim secundele în ani și obținem $10^{28} / (60 \cdot 60 \cdot 24 \cdot 365) = 10^{28} / (3.1 \cdot 10^7) \approx 3.2 \cdot 10^{21}$ ani. Pentru a pune în perspectivă acest număr universul are $13.7 \cdot 10^9$ ani, deci putem trage concluzia că problema logaritmului secret pe curbe eliptice este foarte sigură.
+
+Există mai mulți algoritmi ce pot rezolva problema logaritmului discret pe curbe eliptice în $O(\sqrt{o})$, eficiența acestora depinzând de natura curbei eliptice. Unul dintre aceștia este algoritmul pași de copil pași de gigant realizat de Shanks, sau Baby-step giant-step în engleză. Acest algoritm este de timpul "meet in the middle" și poate fi folosit atât pentru a rezolva ECDLP cât și ajustat pentru a determina cardinalul $E(\mathbb{F}_p)$ (algoritmul pentru determinarea cardinalului poate fi îmbunătățit până la o complexitate de $O(\sqrt[4]{o})$). Pentru a determina $Q = nP$ și fie $m = \bigr[\sqrt{o}\bigr] + 1$ (adică parte întreagă), acest algoritm încearcă să indentifice o coliziune între următoarele două liste:
+\begin{equation*}
+ \begin{split}
+    \text{Lista} 1 : & \: \: \: P, 2P, 3P, ..., (m - 1)P \\
+    \text{Lista} 2 : & \: \: \: mP + Q, 2mP + Q, 3mP + Q, ..., (m - 1)^2P + Q
+ \end{split}
+ \end{equation*}
+
+ Notăm indicele primei liste cu $j$ și pe cel de-a doua liste cu $k$, forma lui $n$ va fi $n = km + j$. O coliziune ar însemna:
+ \begin{equation*}
+ \begin{split}
+    Q & = nP = (km + j)P \\
+    Q & = kmP + jP 
+ \end{split}
+ \end{equation*}
+
+ Observăm că arată aproape exact ca listele, doar că adunăm kmP pe partea greșită de egal, astefel valoarea punctului va fi diferită în coordonata $y$, dar coordonatele $x$ vor fi la fel și vom putea verifica după acestea coliziunea. După acest algoritm $n = j + km$, pentru care $Q = nP$, problema este că s-ar puta să nu fie cel mai mic număr pentru care se verifică egalitatea, de aceea pentru a afla cel mai mic număr putem calcula $n$ modulo ordinul punctului $P$ în curba eliptică.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmul dublare și adunare}
+
+Algoritmul dublare și adunare, sau Double and Add în engleză, este o metodă standard folosită pentru a efectua înmulțirea unui punct de pe o curbă eliptică peste un corp finit cu un scalar. Adică dorim să calculăm $Q = nP$ în $E(\mathbb{F}_{73})$ cât mai eficient.
+
+Acesta este algoritmul dublare și adunare:
+\begin{enumerate}[(1)]
+    \item Configurare: se stabilesc următoarele date:
+    \begin{itemize}
+     \item o curbă eliptică $E$ peste $\mathbb{F}_p$
+     \item un punct $P \in \mathbb{F}_p$
+     \item un scalar pe care o să-l notăm $n$, cu $n \in \mathbb{N}^*$
+   \end{itemize}
+
+   \item Transformarea scalarului în forma sa binară:
+   \begin{itemize}
+     \item Orice scalar are o forma binară unică
+     \begin{equation*}
+     \begin{split}
+      & n = n_0 + n_1 \cdot 2 + n_2 \cdot 2^2 + ... + n_k \cdot 2^k \\
+      & cu \: n_0, n_1, ..., n_r \in \bigl\{0,1\bigl\}
+     \end{split}
+     \end{equation*}
+    \end{itemize}
+
+   \item Inițializăm variabilele locale:
+   \begin{itemize}
+     \item inițializăm valoarea $Q = P$, ce va fi $P \cdot 2^{\text{iterația curentă}}$
+     \item inițializăm valoarea $R = O$, ce va fi rezultatul final
+    \end{itemize}
+
+
+   \item Iterăm prin toți biții lui $n$, începând de la cel mai nesimnificativ:
+   \begin{itemize}
+     \item dacă $n \text{ mod } 2 = 1$, $R = R + Q$
+     \item dublăm valoarea lui $Q$, $Q = 2Q$
+     \item dacă mai există biți ai lui $n$, trecem la următorul bit al lui n
+    \end{itemize}
+
+    \item Rezultatul final va fi $R$, care va fi $R = nP$.
+\end{enumerate}
+
+Algoritmul dublare și adunare este sumarizat în pseudocod în Figura \ref{fig:alg_adunare_si_dublare}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{Licenta/capturi/teorie/algoritmul Double and Add.png}
+    \caption{Algoritmul dublare și adunare}
+    \label{fig:alg_adunare_si_dublare}
+\end{figure}
+
+Datele din exemplul următor au fost preluate din \cite{ref1}.
+\begin{exem}
+Fie numărul prim $p = 3623$ și curba eliptică $E$ 
+\begin{equation*}
+    E : Y^2 = X^3 + 14X + 19
+\end{equation*}
+punctul $P = (6, 730) \in E(\mathbb{F}_{3623})$ și scalarul $n = 947$.
+
+Algoritmul dublare și adunare este prezentat pas cu pas în Figura \ref{fig:ex_alg_adunare_si_dublare_1}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.5\textwidth]{Licenta/capturi/teorie/ex alg adunare dublare X^3 + 14X + 19 mod 3623.png}
+    \caption{$947 \cdot (6, 730)$ pe $Y^2 = X^3 + 14X + 19 \text{ mod } 3623$}
+    \label{fig:ex_alg_adunare_si_dublare_1}
+\end{figure}
+\end{exem}
+
+Algoritmul necesită $10$ dublaje și $7$ adunări, iar rezultatul final este $947P = (3420, 60)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Schimbul de chei Diffie–Hellman pe curbe eliptice (ECDH)}
+
+În acest capitol vom preazenta prima integrare a curbele eliptice în criptografie. Începem cu schimbul de chei Diffie-Hellman pe curbe eliptice sau Elliptic Curve Diffie-Hellman (ECDH) în engleză, care este un protocol de schimb de chei bazat pe criptografia cu curbe eliptice. ECDH permite ca două părți să convină în siguranță asupra unei chei secrete partajate pe un canal de comunicare nesigur. Realizăm schimbul de chei Diffie-Hellman pe curbe cliptice analog cu cel normal, dar schimbăm problema logaritmului discret peste corpul finit $\mathbb{F}_p$ cu problema logaritmului discret pe curba eliptică $E(\mathbb{F}_p)$.
+
+Vom trece prin aceleași etape ca la schimbul de chei Diffie-Hellman normal.
+
+Acesta este algoritmul ce se aplică pentru schimbul de chei Diffie-Hellman pe curbe eliptice:
+\begin{enumerate}[(1)]
+    \item Configurare: cele două părți ce comunicare, Alice și Bob, convin asupra anumitor parametri: 
+    \begin{itemize}
+     \item un număr prim foarte mare pe care o să-l notăm cu $p$
+     \item o curbă eliptică $E$ peste $\mathbb{F}_p$
+     \item un punct $P \in \mathbb{F}_p$
+     \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $p$, $E$ și $P$
+     \end{description}
+   \end{itemize}
+
+   \item Alegerea numerelor secrete: 
+   \begin{itemize}
+     \item Alice alege un număr întreg secret $n_A$ pe care nu-l împărtașește cu nimeni și calculează
+     \begin{equation*}
+      Q_A = n_AP
+    \end{equation*}
+    
+     \item Bob alege un număr întreg secret $n_B$ pe care nu-l împărtașește cu nimeni și calculează
+     \begin{equation*}
+      Q_B = n_BP
+    \end{equation*}
+   \end{itemize}
+
+   \item Schimbul de chei publice: Alice îi trimite $Q_A$ lui Bob si Bob îi trimite $Q_B$ lui Alice pe canalul neprivat:
+   \begin{itemize}
+     \item Alice își folosește numărul secret și calculează
+     \begin{equation*}
+      Q_A' = n_AQ_B
+    \end{equation*}
+    
+     \item Bob își folosește numărul secret și calculează
+     \begin{equation*}
+      Q_B' = n_BQ_A
+    \end{equation*}
+    \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $Q_A$ și $Q_B$
+     \end{description}
+   \end{itemize}
+
+   \item Cheie secretă comună rezultată: valorile pe care le calculează sunt egale și reprezintă cheia comună:
+   \begin{equation*}
+      Q_A' = n_AQ_B = n_A(n_BP) = n_B(n_AP) = n_BQ_A = Q_B'
+    \end{equation*}
+\end{enumerate}
+
+Schimbul de chei Diffie-Hellman pe curbe eliptice este sumarizat în Figura \ref{fig:schimb_chei_diffie_hellman_ec}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{Licenta/capturi/teorie/Schimbul de chei Diffie-Hellman peste EC.png}
+    \caption{Schimbul de chei Diffie-Hellman pe curbe eliptice}
+    \label{fig:schimb_chei_diffie_hellman_ec}
+\end{figure}
+
+Schimbul de chei eliptic Diffie-Hellman oferă mai multe avantaje în ceea ce privește eficiența și securitatea în comparație cu alte schimburi de chei. Acesta oferă securitate puternică cu chei de lungimi mai scurte, făcându-l eficient din punct de vedere computațional. Protocolul este utilizat pe scară largă în diferite sisteme și protocoale criptografice, inclusiv în protocoale de comunicații sigure, cum ar fi TLS (Transport Layer Security) pentru stabilirea unei conexiuni sigure pe internet.
+
+Datele din exemplul următor au fost preluate din \cite{ref1}.
+\begin{exem}
+Vom urma pașii din algoritmul prezentat anterior.
+
+Pasul 1, Alice și Bob stabilesc numărul $p = 3851$ și curba eliptică $E$ și punctul $P$, cu $P \in \mathbb{F}_p$
+\begin{equation*}
+\begin{split}
+    E & : Y^2 = X^3 + 324X + 1287\\ 
+    P & = (920, 303) \in E(\mathbb{F}_{3851})
+\end{split}
+\end{equation*}
+
+Pasul 2, Alice alege numărul întreg secret $n_A = 1194$ și calculează
+\begin{equation*}
+    Q_A = 1194P = (2067, 2178) \in E(\mathbb{F}_{3851})
+\end{equation*}
+
+Analog, Bob alege numărul întreg secret $b = 1759$ și calculează
+\begin{equation*}
+    Q_B = 1759P = (3684, 3125) \in E(\mathbb{F}_{3851})
+\end{equation*}
+
+Pasul 3, Alice îi trimite $(2067, 2178)$ ($Q_A$) lui Bob și Bob îi trimite $(3684, 3125)$ ($Q_B$) lui Alice pe canalul nesecurizat.
+
+Alice își folosește numărul secret și calculează
+\begin{equation*}
+    Q_A' = 1194Q_B = (3347, 1242) \in E(\mathbb{F}_{3851})
+\end{equation*}
+    
+Bob își folosește numărul secret și calculează
+\begin{equation*}
+    Q_B' = 1759Q_A = (3347, 1242) \in E(\mathbb{F}_{3851})
+\end{equation*}
+
+Pasul 4, Alice și Bob au obținut cheia secretă comună
+\begin{equation*}
+    (3347, 1242) = n_An_BP = Q_A' = Q_B'
+\end{equation*}
+\end{exem}
+
+Punctul secret comun este $(3347, 1242)$, dar după cum va fi explicat în Remarca \ref{rem:diffie_hellman_ec}, suntem interesați doar de componenta $x$ a punctului, adică cheia secretă comună va fi considerată numărul $3347$.
+
+Eve are acces la următoarele date: numărul prim $p$, curba eliptică $E$, punctul de pe curbă $P$ și valorile $Q_A$ și $Q_B$. Ceea ce înseamnă ca dacă Eve dorește să determine cheia secretă comună a lui Alice și Bob, aceasta trebuie sa rezolve una din cele două probleme ale logaritmului discret pe curbe eliptice
+\begin{equation*}
+\begin{split}
+    Q_A & = n_AP \\ 
+    Q_B & = n_BP 
+\end{split}
+\end{equation*}
+
+Ca la Problema Loaritmului Discret, Eve poate rezolva analogul Problemei Diffie-Hellman (Definiția \ref{defi:pb_diffie_hellman}) adaptată pentru curbe eliptice.
+
+\begin{defi} \label{defi:pb_diffie_hellman_ec}
+(Problema Diffie-Hellman pe curbe eliptice) Fie $E(\mathbb{F}_p)$ o curbă eliptică peste un corp finit și fie punctul $P \in E(\mathbb{F}_p)$. Problema Diffie-Hellman pe curbe eliptice este problema determinării valorii $n_1n_2P$ cunoscând valorile $n_1P$ și $n_2P$.
+\end{defi}
+
+Urmatoarul paragraf a fost preluat și adaptat din \cite{ref1}
+
+\begin{rem} \label{rem:diffie_hellman_ec}
+Schimbul de chei Diffie–Hellman pe curbe eliptice necesită ca Alice și Bob să schimbe puncte pe o curbă eliptică. Un punct $Q \in E(\mathbb{F}_p)$ este format din două coordonate $Q = (x_Q,y_Q)$, unde $x_Q$ și $y_Q$ sunt elemente ale corpului finit $(\mathbb{F}_p)$, așa că pare că Alice trebuie să-i trimită lui Bob două numere în $(\mathbb{F}_p)$. Cu toate acestea, cele două numere modulo $p$ nu conțin la fel de multe informații ca două numere arbitrare, deoarece sunt legate prin formula
+\begin{equation*}
+    E : y_Q^2 = x_Q^3 + ax_Q + b \text{ (mod $p$)}
+\end{equation*}
+
+A se nota că Eva cunoaște $A$ și $B$, deci dacă poate ghici valoarea corectă a lui $x_Q$, atunci există doar două valori posibile pentru $y_Q$, iar în practică se calculează ușor cele două valori ale lui $y_Q$.
+
+Prin urmare, există puține motive pentru ca Alice să trimită ambele coordonate ale $Q_A$ lui Bob, deoarece coordonata $y$ conține puține informații suplimentare. În schimb, ea îi trimite lui Bob doar coordonatele $x$ a puntului $Q_A$. Bob calculează apoi și folosește unul dintre cele două coordonate $y$ posibile. Dacă se întâmplă să aleagă $y$ „corect”, atunci el folosește $Q_A$, iar dacă alege $y$ „incorect” (care este negativul lui $y$ corect), atunci el folosește -$Q_A$. În orice caz, Bob ajunge să calculeze unul dintre valorile 
+\begin{equation*}
+    \pm n_BQ_A = \pm (n_An_B)P
+\end{equation*}
+
+În mod similar, Alice ajunge să calculeze unul dintre $\pm (n_An_B)P$. Apoi Alice și Bob utilizează coordonatele $x$ ca valoare secretă comună, deoarece acea coordonată $x$ este la fel indiferent de ce $y$ folosesc.
+\end{rem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Criptosistemul ElGamal pe curbe eliptice}
+
+Criptosistemul ElGamal pe curbe eliptice este o schemă de criptare cu cheie publică bazată pe criptografia pe curbe eliptice. Este o extensie a criposistemului ElGamal (prezentat în Capitolul 3.3), adaptat pentru a lucra pe curbe eliptice în locul corpurilor finite tradiționale.
+
+Acesta este algoritmul dacă Bob dorește să-i trimită un mesaj lui Alice:
+\begin{enumerate}[(1)]
+    \item Configurare: se stabilesc parametrii publici: 
+    \begin{itemize}
+     \item un număr prim foarte mare pe care o să-l notăm cu $p$
+     \item o curbă eliptică $E$ peste $\mathbb{F}_p$
+     \item un punct $P$, cu $P \in$ $E(\mathbb{F}_p)$
+     \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la numărul prim $p$, curba eliptică $E$ peste $\mathbb{F}_p$ și la punctul $P$
+     \end{description}
+   \end{itemize}
+
+   \item Crearea cheii publice: 
+   \begin{itemize}
+     \item Alice alege o cheie secretă $n_A$ pe care nu o împărtașește cu nimeni
+     \item Alice calculează cheia publică $Q_A$
+     \begin{equation*}
+        Q_A = n_AP
+    \end{equation*}
+    \item Alice își publică cheia publică
+   \end{itemize}
+
+   \item Criptarea:
+   \begin{itemize}
+     \item Bob alege mesajul $M$, cu $M \in$ $E(\mathbb{F}_p)$, pe care dorește să-l trmită
+     \item Bob alege o cheie aleatore temporală $k$
+     \item Bob folosește cheia publică a lui Alice pentru a calcula
+     \begin{equation*}
+     \begin{split}
+        C_1 & = kP \in E(\mathbb{F}_p) \\
+        C_2 & = M+ kQ_A \in E(\mathbb{F}_p)
+    \end{split}
+    \end{equation*}
+    
+     \item Bob îi trimtie mesajul criptat $(C_1, C_2)$ lui Alice
+    \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $(C_1, C_2)$
+     \end{description}
+   \end{itemize}
+
+   \item Decriptarea:
+   \begin{itemize}
+    \item Alice calculează
+    \begin{equation*}
+        C_2 - n_AC_1 \in E(\mathbb{F}_p)
+     \end{equation*}
+     \item rezultatul obținut este $M$
+    \end{itemize}
+\end{enumerate}
+
+Algoritmul eliptic ElGamal pentru creare de chei, criptare și decriptare este sumarizat în Figura \ref{fig:alg_eliptic_elgamal}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{Licenta/capturi/teorie/algoritmul eliptic ElGamal pentru creare chei, criptare si decriptare.png}
+    \caption{Algoritmul eliptic ElGamal pentru creare de chei, criptare și decriptare}
+    \label{fig:alg_eliptic_elgamal}
+\end{figure}
+
+Securitatea criptosistemului ElGamal pe curbe eliptice se bazează pe dificultatea rezolvării problemei logaritmului discret pe curbe eliptice. Confidențialitatea mesajului este păstrată, deoarece un adversar care nu cunoaște cheia privată sau cheia privată temporală nu ar putea să calculeze secretul partajat sau să recupereze mesajul.
+
+De asemenea, de marcat este faptul că criptosistemul ElGamal oferă securitate semantică, ceea ce înseamnă că un atacator nu poate afla nicio informație despre mesajul trimis din textul cifrat fără cunoașterea cheii private. Cu toate acestea, este important faptul că ElGamal nu oferă integritatea mesajului sau autentificare. Pentru a realiza aceste proprietăți, mecanisme suplimentare precum semnăturile digitale sau codurile de autentificare a mesajelor, sau message authentication codes (MAC) în engleză, pot fi utilizate împreună cu criptarea ElGamal pe curbe eliptice.
+
+Există totuși două probleme majore legate de acest criptosistem.
+
+\begin{rem}
+\begin{enumerate}[(a)]
+    \item Prima problemă este că nu există un mod natural de a atașa un mesaj textual la un punct din $E(\mathbb{F}_p)$, acest fapt duce la dificultăți când trebuie partajate texte. Conform Teoremei lui Hasse (Teorema \ref{teo:thhasse}) există aproximativ $p$ puncte diferite în $E(\mathbb{F}_p)$, deci numai $p$ diferite mesaje text ce pot fi criptate. Au fost propuse diferite metode pentru a rezolva acestă problemă, una dintre acestea fiind implementată în criptosistemul eliptic Menezes-Vanstone, în care textul este mascat de către mesajul $M$ ales și nu scufundat.
+
+    \item A doua problemă este rata de expansiune de $4$ la $1$ pentru criptosistemul eliptic ElGamal, coparativ cu rata de $2$ la $1$ criptosistemul ElGamal peste corpuri finite. Acest lucru se datorează trimiterii mesajului criptat $(C_1, C_2)$, unde fiecare element este un punct de pe curba eliptică, deci are doi componente. Putem încerca abordarea de la schimbul de chei eliptic Diffie-Hellman, unde trimiteam doar componenta $x$ a punctului, însă în acest caz rezultatele finale sunt diferite ($C_2 - n_AC_1$ are un rezultat diferit de $C_2 + n_AC_1$). Totuși, pentru fiecare coordonată $x$ sunt maxim 2 valori $y$ ce pot exista, deci la componenta $x$ a punctelor $C_1, C_2$, putem atașa un bit $\in \bigl\{0, 1\bigl\}$ care să denote ce coordonată $y$ utilizăm în calcule, bitul fiind $0$ dacă este mai mică decât jumătatea moduloului folosit de curba eliptică și 1 altfel (cum punctele sunt opuse, înseamnă că adunarea coordonatelor $y$ ale acestora o să fie fix modulo-ul, ceea ce înseamnă că pucntele opuse nu pot avea același bit atașat).
+\end{enumerate}
+\end{rem}
+
+\begin{exem}
+Vom urma pașii din algoritmul prezentat anterior.
+
+Pasul 1, configurare: Alice și Bob stabilesc numărul $p = 31$ și curba eliptică E și punctul P
+\begin{equation*}
+\begin{split}
+    E & : Y^2 = X^3 + X + 13 \\ 
+    P & = (9, 10) \in E(\mathbb{F}_{31})
+\end{split}
+\end{equation*}
+
+Pasul 2, crearea cheii publice: Alice alege numărul întreg secret $n_A = 5$ și calculează
+\begin{equation*}
+    Q_A = n_AP = 5(9, 10) = (25, 16)
+\end{equation*}
+
+Alice își publică cheia publică $Q_A = (25, 16)$
+
+Pasul 3, criptarea: Bob alege ca mesajul să fie $M = (20, 2)$ și cheia temporală $k = 7$, Bob folosește cheia publică a lui Alice pentru a calcula
+\begin{equation*}
+\begin{split}
+    C_1 & = kP = 7(9, 10) = (6, 24)  \\
+    C_2 & = M + kQ_A = (20, 2) + 7(25, 16) \\ 
+    & = (20, 2) + (9, 10) = (22, 22)
+\end{split}
+\end{equation*}
+
+Bob îi trimtie mesajul criptat $(C_1, C_2) = ((6, 24), (22, 22))$ lui Alice
+
+Pasul 4, decriptarea: Alice decriptează mesajul primit de la Bob
+\begin{equation*}
+\begin{split}
+    C_2 - n_AC_1 & = (22, 22) - 5(6, 24) \\
+    & = (22, 22) - (9, 10) \\
+    & = (22, 22) + (9, 21) = (20, 2)
+\end{split}
+\end{equation*}
+
+Rezultatul $(20, 2)$, fiind punctul $M$ ales de Bob.
+\end{exem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmul de semnare digitală pe curbe eliptice (ECDSA)}
+
+Algoritmul de semnare digitală pe curbe eliptice, sau Elliptic Curve Digital Signature Algorithm (ECDSA) în engleză, este un algoritm de semnătură digitală bazat pe criptografia cu curbe eliptice. Acesta a fost oficial implementat în \cite{ref11} și permite crearea de semnături digitale care pot fi verificate de oricine are acces la cheia publică. ECDSA este utilizat pe scară largă pentru autentificarea mesajelor, integritatea și non-repudierea în diferite criptosisteme.
+
+Acesta este algoritmul dacă Samantha semnează un document, iar Victor dorește să verifice semnătura:
+\begin{enumerate}[(1)]
+    \item Configurare: se stabilesc parametrii publici: 
+    \begin{itemize}
+     \item un număr prim foarte mare pe care o să-l notăm cu $p$
+     \item o curbă eliptică $E$ peste $\mathbb{F}_p$
+     \item un punct $G$, cu $G \in$ $E(\mathbb{F}_p)$
+     \begin{description}
+     \item[notă:] ordinul punctului $G$ ar trebui să fie un număr prim mare, notat $q$
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la numărul prim $p$, curba eliptică $E$ peste $\mathbb{F}_p$ și la punctul $G$
+     \end{description}
+   \end{itemize}
+
+   \item Crearea cheii de verificare: 
+   \begin{itemize}
+     \item Samantha alege o cheie de semnare secretă $s$ pe care nu o împărtașește cu nimeni cu proprietatea că
+     \begin{equation*}
+        1 < s < q - 1
+    \end{equation*}
+     \item Samantha calculează cheia de verificare publică $V$
+     \begin{equation*}
+        V = sG \in E(\mathbb{F}_p)
+    \end{equation*}
+    \item Samantha își publică cheia de verificare publică $V$
+   \end{itemize}
+
+   \item Semnare:
+   \begin{itemize}
+     \item Samantha alege documentul ce va fi semnat $d \text{ mod } q$
+     \item Samantha alege o cheie temporală $e \text{ mod } q$
+     \item Samantha calculează punctul $R$, cu $R \in$ $E(\mathbb{F}_p)$
+     \begin{equation*}
+        R = eG
+     \end{equation*}
+     \item Samantha procesează semnăturile  $s_1$ și $s_2$, unde $s_1$ este componenta $x$ a punctului $R$
+     \begin{equation*}
+     \begin{split}
+        s_1 & \equiv R.x \text{ mod } q \\
+        s_2 & \equiv e^{-1}(d + ss_1) \text{ mod } q
+    \end{split}
+    \end{equation*}
+    
+     \item Samantha publică semnătura $(s_1, s_2)$
+    \begin{description}
+     \item[notă:] cum comunicarea se realizează pe un canal neprivat, Eve are acces la $(s_1, s_2)$
+     \end{description}
+   \end{itemize}
+
+   \item Decriptarea:
+   \begin{itemize}
+    \item Victor calculează numerele $v_1$ și $v_2$
+    \begin{equation*}
+     \begin{split}
+        v_1 & \equiv ds_2^{-1} \text{ mod } q \\
+        v_2 & \equiv d + s1s_2^{-1} \text{ mod } q
+    \end{split}
+    \end{equation*}
+    \item Victor calculează punctul $R'$, cu $R' \in$ $E(\mathbb{F}_p)$
+    \begin{equation*}
+        R' = v_1G + v_2V
+     \end{equation*}
+    \item Victor verifică semnătura după egalitatea componentelor $x$ ale rezultatelor
+    \begin{equation*}
+        R'.x \text{ mod } q = s_1
+     \end{equation*}
+    \end{itemize}
+\end{enumerate}
+
+Algoritmul de semnare digitală pe curbe eliptice este sumarizat în Figura \ref{fig:alg_ecdsa}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\textwidth]{Licenta/capturi/teorie/ECDSA.png}
+    \caption{Algoritmul de semnare digitală pe curbe eliptice}
+    \label{fig:alg_ecdsa}
+\end{figure}
+
+Securitatea algoritmul de semnare digitală pe curbe eliptice se bazează pe dificultatea de rezolvare a problemei logaritmulei discret pe curbe eliptice. Cheia privată servește este utilizată în procesul de semnare, iar cheia publică permite verificarea semnăturii. Schema este concepută astfel încât numai deținătorul cheii private poate produce semnături valide, în timp ce oricine are acces la cheia publică poate verifica semnăturile.
+
+Algoritmul de semnare digitală pe curbe eliptice oferă mai multe avantaje față de alte scheme de semnătură digitală, inclusiv dimensiuni mai scurte ale cheilor și calcule mai eficiente în comparație cu schemele tradiționale bazate pe corpuri finite. Acesta este utilizat pe scară largă în diverse sisteme și protocoale criptografice, inclusiv protocoale de comunicații securizate precum TLS (Transport Layer Security) și certificate digitale pentru verificarea identității în infrastructurile cu chei publice, sau  public key infrastructures (PKI) în engleză.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Aplicația suport}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Tehnologii utilizate}
+
+Python, Flask, numpy, simpy, matplotlib, bootstrap
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Adunare a două puncte pe o curbă eliptică în $\mathbb{R}$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Înmulțirea unui punct cu un scalar pe o curbă eliptică în $\mathbb{R}$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Adunare a două puncte pe o curbă eliptică în $\mathbb{F}_p$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Înmulțirea unui punct cu un scalar pe o curbă eliptică în $\mathbb{F}_p$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Aproximare spargere ECDLP}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulare spargere ECDLP}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulare ECDH}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulare ECDH îmbunătățit}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulare criptosistem eliptic ElGamal}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulare criptosistem eliptic Menezes–Vanstone}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Generare curbe eliptice aleatoare}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Date suplimentare despre o anumită curbă eliptică}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\addcontentsline{toc}{section}{5\quad Bibliografie}
+\begin{thebibliography}{99}
+
+\bibitem{ref1} J. Hoffstein et al., \textit{An Introduction to Mathematical Cryptography}, 1 DOI: 10.1007/978-0-387-77994-2 1, @ Springer Science+Business Media, LLC 2008.
+
+\bibitem{ref2} Cătălin Liviu Gherghe, \textit{Curbe Eliptice 3}, Criptografie si Teoria Codurilor, Curs 2023.
+
+\bibitem{ref3} W. Diffie and M. E. Hellman. New directions in cryptography. \textit{IEEE Trans. Information Theory}, IT-22(6):644–654, 1976.
+
+\bibitem{ref4} J. W. S. Cassels. \textit{Lectures on Elliptic Curves}, volume 24 of \textit{London Mathematical Society Student Texts}. Cambridge University Press, Cambridge, 1991.
+
+\bibitem{ref5} A. W. Knapp. \textit{Elliptic Curves}, volume 40 of \textit{Mathematical Notes}. Princeton University Press, Princeton, NJ, 1992.
+
+\bibitem{ref6}] S. Lang. \textit{Elliptic Functions}, volume 112 of \textit{Graduate Texts in Mathematics}. Springer-Verlag, New York, 2nd edition, 1987. With an appendix by J. Tate.
+
+\bibitem{ref7} J. H. Silverman. \textit{The Arithmetic of Elliptic Curves}, volume 106 of \textit{Graduate Texts in Mathematics}. Springer-Verlag, New York, 1986.
+
+\bibitem{ref8} J. H. Silverman. \textit{Advanced Topics in the Arithmetic of Elliptic Curves}, volume 151 of \textit{Graduate Texts in Mathematics}. Springer-Verlag, New York, 1994.
+
+\bibitem{ref9} J. H. Silverman. \textit{A Friendly Introduction to Number Theory}. Prentice Hall, Upper Saddle River, NJ, 3rd edition, 2006.
+
+\bibitem{ref10} T. ElGamal. A public key cryptosystem and a signature scheme based on
+discrete logarithms. \textit{IEEE Trans. Inform. Theory}, 31(4):469–472, 1985.
+
+\bibitem{ref11} ANSI-ECDSA. Public key cryptography for the financial services industry: The elliptic curve digital signature algorithm (ECDSA). ANSI Report X9.62, American National Standards Institute, 1998.
+
+\end{thebibliography}
+
+\end{document}

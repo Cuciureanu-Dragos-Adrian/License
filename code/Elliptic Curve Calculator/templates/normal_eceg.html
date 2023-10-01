@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Simulate elliptic ElGamal public key cryptosistem</h1>
+
+    <p>Please provide coefficients for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\) (where \(p\) is a large prime number).<br>
+    Coordinates for the point \(P \in E(F_p)\), Alice's secret numbers \(n_A\). <br>
+    And the coordinates to the message \(M \in E(F_p)\) that Bob chooses to send to Alice and temporal key \(k\). <br>
+    We will show the step by step simulation of the elliptic ElGamal key creation, encryption and decryption.</p>
+
+    The algorithm that we are going to implement is explained in 
+    <a href="static/theory/license.pdf#page=70" target="_blank" title="Documentation">Chaper 5.6.1</a>.
+        
+    <br><br>
+
+    <form id = "myForm" action = "/normal_eceg" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>  
+        
+        <label> Point \(P_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_p_x"/> 
+        <br>
+        <label> Point \(P_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_p_y"/>
+        <br><br>
+
+        <label> Alice's secret number \(n_A\): </label>
+        <input type = "number" name = "secret_n_a"/> 
+        <br><br>
+
+        <label> Message point \(M_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_m_x"/> 
+        <br>
+        <label> Message point \(M_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_m_y"/>
+        <br><br>
+
+        <label> Bob's temporal key \(k\): </label>
+        <input type = "number" name = "temporal_key_k"/> 
+        <br><br>
+
+        <input type = "submit" value = OK />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif plot_url %}
+        <br>
+
+        The elliptic ElGamal public key cryptosistem is summarized in the following picture:
+
+        <div class = "image">
+            <img src = {{plot_url}} alt = "Chart cannot be displayed">
+        </div>
+
+        <br><br>
+
+
+        <h4>Step 1: Configuration</h4>
+        Alice and Bob decide and and publish a prime number \(p = {{ec[2]}}\), the elliptic curve \(E\) over \(F_{ {{ec[2]}} }\) and 
+        the point \(P \in F_{ {{ec[2]}} }\):
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                &amp; E : Y^2 = X^3 + {{ec[0]}}X + {{ec[1]}} \text{ (mod } {{ec[2]}} \text{) } \\
+                &amp; P = {{p}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br><br>
+
+
+        <h4>Step 2: Secret key computation</h4>
+        Alice chosses a secret number \(n_A = {{na}}\), and calculates her public key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                Q_A &amp; = n_AP \\
+                &amp; =  {{na}} \cdot {{p}} \\
+                &amp; = {{qa}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        Alice publishes her public key \(Q_A = {{qa}}\).
+
+        <br><br>
+
+
+        <h4>Step 3: Encryption</h4>
+        Bob chooses the message \(M = {{m}}\) and temporal key \(k = {{k}}\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                C_1 &amp; = kP \\
+                &amp; = {{k}} \cdot {{p}} \\
+                &amp; = {{c1}} \in E(F_{ {{ec[2]}} }) \\
+                \\
+                C_2 &amp; = M + kQ_A \\
+                &amp; = {{m}} + {{k}} \cdot {{qa}} \\
+                &amp; = {{m}} + {{k_qa}} \\
+                &amp; = {{c2}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        Bob sends Alice the encrypted message \((C_1, C_2) = ({{c1}}, {{c2}})\).
+
+        <br><br>
+
+
+        <h4>Step 4: Decryption</h4>
+        Alice decrypts the message received from Bob
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                C_2 - n_AC_1 &amp; = {{c2}} - {{na}} \cdot {{c1}} \\
+                &amp; = {{c2}} - {{na_c1}} \\
+                &amp; = {{c2}} + {{reverse_na_c1}} \\
+                &amp; = {{final_m}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        The result being the point \(M = {{final_m}}\) choosen by Bob.
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}
+

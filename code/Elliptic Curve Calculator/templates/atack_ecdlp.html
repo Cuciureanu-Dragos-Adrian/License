@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Simulate ECDLP meet in the middle atack</h1>
+
+    <p>Please provide coefficients for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\).<br>
+    And coordinates for the base point \(P\) and public key \(Q\), for which we want to determine \(nP = Q\).</p>
+
+    To determine the private key \(n\), for which \(Q = nP\), we have implemented the algorithm Baby Step Giant Step, described in 
+    <a href="static/theory/license.pdf#page=84" target="_blank" title="Documentation">Chaper 5.9</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/atack_ecdlp" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>
+        
+        <label> Point \(P_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_p_x"/> 
+        <br>
+        <label> Point \(P_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_p_y"/>
+        <br><br>
+
+        <label> Point \(Q_x\) coordinate: </label>
+        <input type = "text" name = "coordinate_q_x"/> 
+        <br>
+        <label> Point \(Q_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_q_y"/>
+        <br><br>
+
+        <input type = "submit" value = OK />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif pk %}
+         
+        The algorithm made a total of \({{steps}}\) steps until the first collision.
+        <br>
+        After that we took the modulo of the number that was returned by the algorithm (initial private key \(n = {{pk}}\))
+        by the order of the point (order of point \({{order_point}}\)), and resulted in the actual private key.  
+        <br> 
+        After this process, the actual wanted private key is \(n = log_PQ = {{real_pk}}\), that means
+        <p><span class="math display">
+            \begin{equation}
+                nP = {{real_pk}} \cdot {{p}} = Q{{q}}
+            \end{equation}
+        </span>
+
+        You can check this in <a href="{{ url_for('multiplication_f') }}">Multiplication in \(F_p\)</a> page.
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}

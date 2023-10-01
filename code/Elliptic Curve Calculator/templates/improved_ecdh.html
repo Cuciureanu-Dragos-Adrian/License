@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Simulate improved elliptic Diffie-Hellman key exchange</h1>
+
+    <p>Please provide coefficients for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\) (where \(p\) is a large prime number).<br>
+    Coordinates for the point \(P \in E(F_p)\) and Alice's and Bob's secret numbers \(n_A\) and \(n_B\). <br>
+    We will show the step by step simulation of the improved elliptic curve Diffie-Hellman key exchange, in which only the \(x\)
+    coordinate of the public keys are shared.</p>
+
+    The shared key was obtained implementing the algorithm explained in 
+    <a href="static/theory/license.pdf#page=65" target="_blank" title="Documentation">Chaper 5.5.2</a>.
+        
+    <br><br>
+
+    <form id = "myForm" action = "/improved_ecdh" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>  
+        
+        <label> Point \(P_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_p_x"/> 
+        <br>
+        <label> Point \(P_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_p_y"/>
+        <br><br>
+
+        <label> Alice's secret number \(n_A\): </label>
+        <input type = "number" name = "secret_n_a"/> 
+        <br>
+        <label> Bob's secret number \(n_B\): </label>
+        <input type = "number" name = "secret_n_b"/> 
+        <br><br>
+
+        <input type = "submit" value = OK />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif plot_url %}
+        <br>
+
+        Elliptic Curve Diffie-Hellman key exchange is summarized in the following picture:
+
+        <div class = "image">
+            <img src = {{plot_url}} alt = "Chart cannot be displayed">
+        </div>
+
+        <br>
+
+        The difference in the improved version is that only the \(x\) coordinate of the public keys are shared.
+
+        <br><br>
+        
+
+        <h4>Step 1: Configuration</h4>
+        Alice and Bob decide and and publish a prime number \(p = {{ec[2]}}\), the elliptic curve \(E\) over \(F_{ {{ec[2]}} }\) and 
+        the point \(P \in F_{ {{ec[2]}} }\):
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                &amp; E : Y^2 = X^3 + {{ec[0]}}X + {{ec[1]}} \text{ (mod } {{ec[2]}} \text{) } \\
+                &amp; P = {{p}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br><br>
+
+
+        <h4>Step 2: Secret key computation</h4>
+        Alice chosses a secret number \(n_A = {{secret_numbers[0]}}\), and calculates her public key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                Q_A &amp; = n_AP \\
+                &amp; = {{secret_numbers[0]}} \cdot {{p}} \\
+                &amp; = {{public_keys[0]}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        Bob chosses a secret number \(n_B = {{secret_numbers[1]}}\), and calculates his public key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                Q_B &amp; = n_BP \\
+                &amp; = {{secret_numbers[1]}} \cdot {{p}} \\
+                &amp; = {{public_keys[1]}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br><br>
+
+
+        <h4>Step 3: Public key exchange</h4>
+        Only the \(x\) coordinate of the public keys are shared between Alice and Bob.
+        So, Alice sends Bob \((Q_A)_x = {{public_keys[0][0]}}\) and Bob sends Alice \((Q_B)_x = {{public_keys[1][0]}}\).
+
+        <br><br>
+
+        Alice subtitutes \(x_B = {{public_keys[1][0]}}\) into the equation of \(E\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                y_B^2 &amp; = x_B^3 + {{ec[0]}}x_B + {{ec[1]}} \text{ mod } {{ec[2]}} \\
+                &amp; = {{public_keys[1][0]}}^3 + {{ec[0]}} \cdot {{public_keys[1][0]}} + {{ec[1]}} \text{ mod } {{ec[2]}} \\
+                &amp; = {{square_ys[1]}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        Alice needs to compute a square root of \({{square_ys[1]}}\) modulo \({{ec[2]}}\).
+        <br>
+        We know that if \(t \equiv 3\) mod \(4\), then \(z^{(t + 1)/4}\) is a square root of \(z\) modulo \(t\). Alice determines
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                y_B &amp; = {{square_ys[1]}}^{ ({{ec[2]}}  + 1)/4} \text{ mod } {{ec[2]}}  \\
+                &amp; = {{square_ys[1]}}^{ {{power_ys[1]}} } \text{ mod } {{ec[2]}}  \\
+                &amp; = {{ys[1]}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        That results in \(Q_B = (x_B, y_B)= ({{public_keys[1][0]}}, {{ys[1]}})\), then Alice uses her secret number \(n_A\) and computes the shared key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                Q_A' &amp; = n_AQ_B \\
+                &amp; = {{secret_numbers[0]}} \cdot ({{public_keys[1][0]}}, {{ys[1]}}) \\
+                &amp; = {{shared_keys[0]}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        Bob subtitutes \(x_A = {{public_keys[0][0]}}\) into the equation of \(E\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                y_A^2 &amp; = x_A^3 + {{ec[0]}}x_A + {{ec[1]}} \text{ mod } {{ec[2]}} \\
+                &amp; = {{public_keys[0][0]}}^3 + {{ec[0]}} \cdot {{public_keys[0][0]}} + {{ec[1]}} \text{ mod } {{ec[2]}} \\
+                &amp; = {{square_ys[0]}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        Bob needs to compute a square root of \({{square_ys[0]}}\) modulo \({{ec[2]}}\).
+        <br>
+        Bob determines
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                y_A &amp; = {{square_ys[0]}}^{ ({{ec[2]}}  + 1)/4} \text{ mod } {{ec[2]}}  \\
+                &amp; = {{square_ys[0]}}^{ {{power_ys[0]}} } \text{ mod } {{ec[2]}}  \\
+                &amp; = {{ys[0]}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        That results in \(Q_A = (x_A, y_A)= ({{public_keys[0][0]}}, {{ys[0]}})\), then Bob uses his secret number \(n_B\) and computes the shared key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                Q_B' &amp; = n_BQ_A \\
+                &amp; = {{secret_numbers[1]}} \cdot ({{public_keys[0][0]}}, {{ys[0]}}) \\
+                &amp; = {{shared_keys[1]}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br><br>
+
+
+        <h4>Step 4: Secret common key</h4>
+        Alice and Bob may not have the same \(Q_A^{'} = {{shared_keys[0]}}\) and \(Q_B^{'} = {{shared_keys[1]}}\), but \(x_{Q_A^{'}}\) 
+        and \(x_{Q_B^{'}}\) are the same.
+        <br>
+        And since the secret common key is the \(x\) coordinate of the result, so the secret common key is \({{shared_keys[0][0]}}\).
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}
+

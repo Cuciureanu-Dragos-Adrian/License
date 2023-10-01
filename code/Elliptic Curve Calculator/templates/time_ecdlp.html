@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Aproximate time needed to break ECDLP</h1>
+
+    <p>Please provide the order \(o\) for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\).<br>
+    For this elliptic curve we will determine the time needed to break ECDLP in different time measures.<br>
+    Please make sure that the \(order\) is at most \(256\) \(bits\).</p>
+
+    We will determine the time needed to break the ECDLP for the provided elliptic curve in 
+    different time measures based on the Baby Step Giant Step algorithm, which has an complexity 
+    of approximately \(O(\surd{n})\) and is described in 
+    <a href="static/theory/license.pdf#page=83" target="_blank" title="Documentation">Chaper 5.8</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/time_ecdlp" method = "POST">
+        <label> Order \(o\):</label> 
+        <input type = "number" name = "order_o" required/>         
+        <br><br>
+
+        <input type = "submit" value = "Calculate time" />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if orders %}
+        
+        \(order = {{orders[0]}} \approx 10^{ {{orders[1]}} } \approx 10^{ {{orders[2]}} }\)
+        <br>
+        \(\surd{order} \approx 10^{ {{orders[3]}} }\) 
+
+        <br><br>
+
+        A GHz CPU makes approximately \(10^9\) operations in a second.
+        <br>
+        Based on this we can calculate how much time it would take to break the ECDLP:
+        <br>
+        \(10^{ {{orders[3]}} } / 10^9 \approx 10^{ {{time_measures[0]}} } \) seconds
+        <br>
+        \(10^{ {{time_measures[0]}} } / 60 \approx 10^{ {{time_measures[1]}} } \) minutes
+        <br>
+        \(10^{ {{time_measures[1]}} } / 60 \approx 10^{ {{time_measures[2]}} } \) hours
+        <br>
+        \(10^{ {{time_measures[2]}} } / 24 \approx 10^{ {{time_measures[3]}} } \) days
+        <br>
+        \(10^{ {{time_measures[3]}} } / 365 \approx 10^{ {{time_measures[4]}} } \approx 10^{ {{time_measures[5]}} }\) years
+
+        <br><br>
+        So, it would take \(\approx 10^{ {{time_measures[5]}} }\) years to break ECDLP for the provided elliptic curve's order.
+        <br>
+        The age of universe is \(13.7 \cdot 10^9\) years.
+        <br>
+        In conclusion, ECDLP is secure.
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}

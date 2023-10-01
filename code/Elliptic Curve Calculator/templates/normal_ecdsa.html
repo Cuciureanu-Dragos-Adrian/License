@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Simulate elliptic curve digital signature algorithm</h1>
+
+    <p>Please provide coefficients for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\) (where \(p\) is a large prime number).<br>
+    Coordinates for the point \(G \in E(F_p)\) of a large prime number \(q\). <br>
+    And Alice's signing key \(s\) (with \(1 < s < q - 1\)), the message \(m\) that she will sign and ephemeral key \(e\). <br>
+    We will show the step by step simulation of the elliptic curve digital signature algorithm.</p>
+
+    The algorithm that we are going to implement is explained in 
+    <a href="static/theory/license.pdf#page=78" target="_blank" title="Documentation">Chaper 5.7</a>.
+        
+    <br><br>
+
+    <form id = "myForm" action = "/normal_ecdsa" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>  
+        
+        <label> Point \(G_x\) coordinate: </label> 
+        <input type = "number" name = "coordinate_g_x"/> 
+        <br>
+        <label> Point \(G_y\) coordinate: </label>
+        <input type = "number" name = "coordinate_g_y"/>
+        <br><br>
+
+        <label> Alice's secret signing key \(s\): </label>
+        <input type = "number" name = "secret_s"/> 
+        <br><br>
+
+        <label> Text message \(m\) that will be signed: </label> 
+        <input type = "text" name = "message_m"/> 
+        <br><br>
+
+        <label> Alice's ephemeral key \(e\): </label>
+        <input type = "number" name = "ephemeral_key_e"/> 
+        <br><br>
+
+        <input type = "submit" value = OK />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif plot_url %}
+        <br>
+
+        The elliptic ElGamal public key cryptosistem is summarized in the following picture:
+
+        <div class = "image">
+            <img src = {{plot_url}} alt = "Chart cannot be displayed">
+        </div>
+
+        <br><br>
+
+
+        <h4>Step 1: Configuration</h4>
+        Alice and Bob decide and publish a prime number \(p = {{ec[2]}}\), the elliptic curve \(E\) over \(F_{ {{ec[2]}} }\) and 
+        the point \(G \in F_{ {{ec[2]}} }\):
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                &amp; E : Y^2 = X^3 + {{ec[0]}}X + {{ec[1]}} \text{ (mod } {{ec[2]}} \text{) } \\
+                &amp; G = {{g}} \in E(F_{ {{ec[2]}} }) \\
+                &amp; q = \text{ord(} G \text{)} = {{q}}
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br><br>
+
+
+        <h4>Step 2: Key creation</h4>
+        Alice chosses the secret signing key \(s = {{s}}\), and calculates the verification key
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                V &amp; = sG \\
+                &amp; =  {{s}} \cdot {{g}} \\
+                &amp; = {{v}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        <br>
+
+        Alice publishes the verification key \(V = {{v}}\).
+
+        <br><br>
+
+
+        <h4>Step 3: Signing</h4>
+        Alice chooses the message \(m =\) "{{m}}" to be signed, then she computes the hash of the message 
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                \text{hash(} m \text{)} &amp; = \text{SHA-256(} m \text{)} \\
+                &amp; =  {{hash_m}}
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        Then she determines the document \(d\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                d &amp; = base_{10}(\text{hash(} m \text{)}) \text{ mod } {{q}} \\
+                &amp; = {{int_d}} \text{ mod } {{q}} \\
+                &amp; = {{d}}
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        Alice chosses the ephemeral key \(e = {{e}}\) and computes the point \(R\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                R &amp; = eG \\
+                &amp; =  {{e}} \cdot {{g}} \\
+                &amp; = {{r}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        And the signatures
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                s_1 &amp; = R_x \text{ mod } {{q}} \\
+                &amp; = {{s1}} \\
+                s_2 &amp; = e^{-1}(d + ss_1) \text{ mod } {{q}} \\
+                &amp; = {{e}}^{-1} \cdot ({{d}} + {{s}} \cdot {{s1}}) \text{ mod } {{q}} \\
+                &amp; = {{s2}}
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        Alice publishes the signatures \((s_1, s_2) = ({{s1}}, {{s2}})\).
+
+        <br><br>
+
+
+        <h4>Step 4: Verification</h4>
+        Bob computes \(v_1\) and \(v_2\)
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                v_1 &amp; = ds_2^{-1} \text{ mod } {{q}} \\
+                &amp; = {{d}} \cdot {{s2}}^{-1} \text{ mod } {{q}} \\
+                &amp; = {{v1}} \\
+                v_2 &amp; = s_1s_2^{-1} \text{ mod } {{q}} \\
+                &amp; = {{s1}} \cdot {{s2}}^{-1} \text{ mod } {{q}} \\
+                &amp; = {{v2}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        Then he computes
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                R' &amp; = v_1G + v_2V \\
+                &amp; =  {{v1}} \cdot {{g}} + {{v2}} \cdot {{v}} \\
+                &amp; =  {{term1}} + {{term2}} \\
+                &amp; = {{r_prime}} \in E(F_{ {{ec[2]}} })
+            \end{split}
+            \end{equation}
+        </span></p>
+
+        Bob verifies that
+        <p><span class="math display">
+            \begin{equation}
+            \begin{split}
+                R'_x \text{ mod } q &amp; = s_1 \\
+                {{r_prime[0]}} \text{ mod } {{q}} &amp; = {{s1}} \\
+                {{r_prime_x}} &amp; = {{s1}}
+            \end{split}
+            \end{equation}
+        </span></p>
+        
+        Because the numbers are equal, the signature is valid.
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}
+

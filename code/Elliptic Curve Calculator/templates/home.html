@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br><br><br><br>
+    <h1>Elliptic Curve Calculator</h1>
+    <p>Welcome to my Elliptic Curve Calculator, this is a project for my License and it can do the following operations:</p>
+    <ul>
+        <li><a class="dropdown-item" href="{{ url_for('addition_r') }}">Addition in $R$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('addition_f') }}">Addition in $F_p$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('multiplication_r') }}">Multiplication in $R$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('multiplication_f') }}">Multiplication in $F_p$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('normal_ecdh') }}">ECDH key exchange</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('improved_ecdh') }}">Improved ECDH key exchange</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('normal_eceg') }}">Elliptic ElGamal</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('improved_eceg') }}">Improved elliptic ElGamal</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('normal_ecdsa') }}">ECDSA</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('time_ecdlp') }}">Time to break ECDLP</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('atack_ecdlp') }}">Simulate ECDLP attack</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('order_point') }}">Order of point $P \in E(F_p)$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('order_ec') }}">Order of elliptic curve over $F_p$</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('random_ec_f') }}">Generate random EC over $F_p$</a></li>
+    </ul>
+{% endblock %}

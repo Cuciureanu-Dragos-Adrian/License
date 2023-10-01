@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Generate random Elliptic Curve over \(F_p\)</h1>
+
+    <p>Please provide the prime number \(p\) and the order for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\)
+        you want to generate.
+    </p>
+
+    More details can be found here
+    <a href="static/theory/license.pdf#page=88" target="_blank" title="Documentation">Chaper 5.12</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/random_ec_f" method = "POST">
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>
+
+        <input type = "submit" value = "Generate random elliptic curve" />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif ec %}
+        <!-- <img src = {{plot_url}} alt = "Chart cannot be displayed"> -->
+
+        The randomly generated elliptic curve is
+        <p><span class="math display">
+            \begin{equation}
+                E : Y^2 = X^3 + {{ec[0]}}X + {{ec[1]}} \text{ (mod } {{ec[2]}} \text{) } \\
+            \end{equation}
+        </span></p>
+
+        The Order of the generated elliptic curve is \({{order}}\).
+        <br>
+        That means that for every point \(p \in E(F_{ {{ec[2]}} })\)
+        <p><span class="math display">
+            \begin{equation}
+                order \cdot P = {{order}} \cdot P = O('inf', 'inf')
+            \end{equation}
+        </span>
+
+        You can check this in <a href="{{ url_for('multiplication_f') }}">Multiplication in \(F_p\)</a> page.
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}

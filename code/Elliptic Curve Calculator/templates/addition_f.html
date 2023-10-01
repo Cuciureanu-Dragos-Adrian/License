@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <h1>Elliptic Curve Addition in \(F_p\)</h1>
+
+    <p>Please provide coefficients for the elliptic curve \(Y^2 = X^3 + aX + b\) mod \(p\).<br>
+    And coordinates for the points \(P\) and \(Q\).</p>
+
+
+    The result will be obtained implementing the algorithm point addition in \(F_p\), described in 
+    <a href="static/theory/license.pdf#page=58" target="_blank" title="Documentation">Chaper 5.3.2</a>.
+
+    <br><br>
+
+    <form id = "myForm" action = "/addition_f" method = "POST">
+        <label> Coefficient \(a\):</label> 
+        <input type = "number" name = "coefficient_curve_a" required/> 
+        <br>
+        <label> Coefficient \(b\): </label> 
+        <input type = "number" name = "coefficient_curve_b" required/>
+        <br><br>
+
+        <label> Prime number \(p\): </label>
+        <input type = "number" name = "prime_p"/> 
+        <br><br>
+        
+        <label> Point \(P_x\) coordinate: </label> 
+        <input type = "text" name = "coordinate_p_x"/> 
+        <br>
+        <label> Point \(P_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_p_y"/>
+        <br><br>
+
+        <label> Point \(Q_x\) coordinate: </label>
+        <input type = "text" name = "coordinate_q_x"/> 
+        <br>
+        <label> Point \(Q_y\) coordinate: </label>
+        <input type = "text" name = "coordinate_q_y"/>
+        <br><br>
+
+        <input type = "submit" value = OK />
+        <input type = "button" onclick = "reset()" value = "Reset">
+        <br>
+    </form>
+
+    <br>
+
+    {% if error_flag %}
+        {{error_message}}
+
+    {% elif plot_url %}
+        <div class = "image">
+            <img src = {{plot_url}} alt = "Chart cannot be displayed">
+        </div>
+
+        <br><br>
+
+        <p>The results are the following: </p>
+    
+        <table>
+            <th>\(Point\)</th>
+            <th>\(X\)</th>
+            <th>\(Y\)</th>
+
+            {% for point in data %}
+                <tr>
+                    <td>\({{point}}\)</td>
+                    <td>\({{data[point][0]}}\)</td>
+                    <td>\({{data[point][1]}}\)</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <br><br>
+
+        {% if case == 1 %}
+            We are in the first case where \(P\) or \(Q\) = \(O(inf, inf)\).
+            <br><br>
+
+            From the theory we know that \(O\) is the neutral element, so for any point T:
+            <p><span class="math display">
+                \begin{equation}
+                    T + O = T
+                \end{equation}
+            </span></p>
+
+            So the result of \(P + Q\) is \(R({{data['R'][0]}}, {{data['R'][1]}})\).
+
+        {% endif %}
+
+        {% if case == 2 %}
+            We are in the second case where \(P = -Q\), meaning \(P_x = Q_x\) and \(P_y = p - Q_y\).
+            <br><br>
+
+            From the theory we know that:
+            <p><span class="math display">
+                \begin{equation}
+                    P + -P = O(inf, inf)
+                \end{equation}
+            </span></p>
+
+            So the result of \(P + Q\) is \(R({{data['R'][0]}}, {{data['R'][1]}})\).
+
+        {% endif %}
+
+        {% if case == 3 %}
+            We are in the third case where \(P = Q\), meaning \(x_P = x_Q\) and \(y_P = y_Q\).
+            <br><br>
+
+            We remind that if a fraction is not an integer in \(F_p\) then:
+            <p><span class="math display">
+                \begin{equation}
+                    \dfrac {x} {y} \text{ (mod p)} = x \cdot y^{-1} \text{ (mod p)}
+                \end{equation}
+            </span>
+
+            First, we calculate the slope \(m\) of the line that is tangent to the line of the elliptic curve \(E\) at \(P\):
+            <p><span class="math display">
+                \begin{equation}
+                \begin{split}
+                    m &amp; = \dfrac {3x_P + a} {2y_P} \text{ (mod p)} \\
+                    &amp; = \dfrac {3 \cdot {{data['P'][0]}} + {{coefficients[0]}} } {2 \cdot {{data['P'][1]}} } \text{ (mod {{prime}})} \\
+                    &amp; = (3 \cdot {{data['P'][0]}} + {{coefficients[0]}}) \cdot (2 \cdot {{data['P'][1]}})^{-1} \text{ (mod {{prime}})} \\
+                    &amp; = {{t[0]}} \cdot {{t[1]}} \text{ (mod {{prime}})} \\
+                    &amp; = {{slope}}
+                \end{split}
+                \end{equation}
+            </span></p>
+
+            
+            Then we determine the coordinates of the result \(R\):
+            <p><span class="math display">
+                \begin{equation}
+                \begin{split}
+                    x_R &amp; = m^2 - x_P^2 - x_Q^2 \text{ (mod p)} \\
+                    &amp; = ({{slope}})^2 - ({{data['P'][0]}})^2 - ({{data['Q'][0]}})^2 \text{ (mod {{prime}})} \\
+                    &amp; = {{data['R'][0]}} \\
+                    \\
+                    y_R &amp; = m(x_P - x_R) - y_P \text{ (mod p)} \\
+                    &amp; = {{slope}}({{data['P'][0]}} - {{data['R'][0]}}) - {{data['P'][1]}} \text{ (mod {{prime}})} \\
+                    &amp; = {{data['R'][1]}}
+                \end{split}
+                \end{equation}
+            </span></p>
+
+            So the result of \(P + Q\) is \(R({{data['R'][0]}}, {{data['R'][1]}})\).
+
+        {% endif %}
+
+        {% if case == 4 %}
+            We are in the fourth case where \(P \neq Q\), meaning \(x_P \neq x_Q\) or \(y_P \neq y_Q\).
+            <br><br>
+
+            We remind that if a fraction is not an integer in \(F_p\) then:
+            <p><span class="math display">
+                \begin{equation}
+                    \dfrac {x} {y} \text{ (mod p)} = x \cdot y^{-1} \text{ (mod p)}
+                \end{equation}
+            </span>
+
+            First we calculate the slope \(m\) of the line that passes through the points \(P\) and \(Q\):
+            <p><span class="math display">
+                \begin{equation}
+                \begin{split}
+                    m &amp; = \dfrac { y_Q - y_P} {x_Q - x_P} \text{ (mod p)} \\
+                    &amp; = \dfrac { {{data['Q'][1]}} - {{data['P'][1]}} } { {{data['Q'][0]}} - {{data['P'][0]}} } \text{ (mod {{prime}})} \\
+                    &amp; = ({{data['Q'][1]}} - {{data['P'][1]}}) \cdot ({{data['Q'][0]}} - {{data['P'][0]}})^{-1} \text{ (mod {{prime}})} \\
+                    &amp; = {{t[0]}} \cdot {{t[1]}} \text{ (mod {{prime}})} \\
+                    &amp; = {{slope}}
+                \end{split}
+                \end{equation}
+            </span></p>
+            
+            Then we determine the coordinates of the result \(R\):
+            <p><span class="math display">
+                \begin{equation}
+                \begin{split}
+                    x_R &amp; = m^2 - x_P - x_Q \text{ (mod p)} \\
+                    &amp; = ({{slope}})^2 - {{data['P'][0]}} - {{data['Q'][0]}} \text{ (mod {{prime}})} \\
+                    &amp; = {{data['R'][0]}} \\
+                    \\
+                    y_R &amp; = m(x_P - x_R) - y_P \text{ (mod p)} \\
+                    &amp; = {{slope}}({{data['P'][0]}} - {{data['R'][0]}}) - {{data['P'][1]}} \text{ (mod {{prime}})} \\
+                    &amp; = {{data['R'][1]}}
+                \end{split}
+                \end{equation}
+            </span></p>
+
+            So the result of \(P({{data['P'][0]}}, {{data['P'][1]}}) + Q({{data['Q'][0]}}, {{data['Q'][1]}})\) is \(R({{data['R'][0]}}, {{data['R'][1]}})\).
+
+        {% endif %}
+
+    {% endif %}
+
+    <br><br>
+
+{% endblock %}
